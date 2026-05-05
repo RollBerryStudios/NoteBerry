@@ -8,10 +8,21 @@
   <strong>Rich local note taking designed for virtual tabletop preparation and play.</strong>
 </p>
 
+<p align="center">
+  <img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-yellow.svg">
+  <img alt="Version" src="https://img.shields.io/badge/version-0.1.1-blue.svg">
+  <img alt="Electron" src="https://img.shields.io/badge/Electron-41-47848F?logo=electron&logoColor=white">
+  <img alt="Local First" src="https://img.shields.io/badge/local--first-offline-brightgreen.svg">
+</p>
+
 NoteBerry is a free, local-first Electron app for campaign notes, session prep,
 NPC records, locations, quests, lore, rules, handouts, and table secrets. It is
 built for tabletop workflows: fast search, structured templates, tags,
 visibility states, markdown preview, TODO tracking, wiki links, and backlinks.
+
+It is intentionally standalone: use it beside an analog table, another VTT, or
+any campaign workflow where you want focused notes without a full tabletop
+suite.
 
 ## Features
 
@@ -21,9 +32,10 @@ visibility states, markdown preview, TODO tracking, wiki links, and backlinks.
 | VTT Categories | Session, NPC, Location, Quest, Item, Lore, Rules, and Handout |
 | Templates | One-click NPC, Location, Quest, and Session note starters |
 | Tags | Comma-based tag editing and tag filters |
-| Visibility | GM, Table, and Secret note states |
+| Visibility | GM, Table, and Secret note states with a dedicated visibility filter |
 | Markdown Preview | Headings, bullets, emphasis, code, and wiki link highlighting |
 | Table Intel | TODO counter, wiki links, tag chips, and backlinks |
+| Multilingual UI | English and German interface |
 | Persistence | Autosaved local JSON workspace with import/export |
 | Responsive UI | Desktop and narrow viewport layouts covered by Playwright screenshots |
 
@@ -39,7 +51,11 @@ npm run dev
 ```bash
 npm run build
 npm run pack
+npm run dist
 ```
+
+The GitHub release workflow builds Windows `.exe`, Linux `.AppImage`/`.deb`,
+and macOS `.dmg`/`.zip` artifacts.
 
 ## Test
 
@@ -50,7 +66,7 @@ npm run test:e2e
 The E2E suite launches Electron with isolated test data and validates:
 
 - first render and core UI
-- search, category filters, and tag filters
+- search, category filters, tag filters, and visibility filters
 - template note creation
 - markdown preview and table intel
 - edit persistence
