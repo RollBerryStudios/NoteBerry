@@ -111,6 +111,13 @@ test.describe('NoteBerry Electron QA', () => {
     }
   })
 
+  test('flushes pending note edits when the window closes immediately', async ({}, testInfo) => {
+    const { app, page, workspacePath } = await launchNoteBerry(testInfo)
+    await page.getByLabel('Note content').fill('Quick close field report with [[Hidden Pier]].')
+    await app.close()
+    expect(readSavedWorkspace(workspacePath).notes[0].content).toContain('Quick close field report')
+  })
+
   test('updates pinning, status, visibility states, and note ordering', async ({}, testInfo) => {
     const { app, page, workspacePath } = await launchNoteBerry(testInfo)
     try {

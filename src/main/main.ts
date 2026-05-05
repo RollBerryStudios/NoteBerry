@@ -158,6 +158,13 @@ function ownerWindow(event: IpcMainInvokeEvent): BrowserWindow | null {
 function registerIpc(): void {
   ipcMain.handle('noteberry:workspace-load', () => loadWorkspace())
   ipcMain.handle('noteberry:workspace-save', (_event, workspace: NoteWorkspace) => saveWorkspace(workspace))
+  ipcMain.on('noteberry:workspace-save-sync', (event, workspace: NoteWorkspace) => {
+    try {
+      event.returnValue = saveWorkspace(workspace)
+    } catch {
+      event.returnValue = false
+    }
+  })
   ipcMain.handle('noteberry:workspace-export', async (event, workspace: NoteWorkspace) => {
     const options = {
       title: 'Export NoteBerry workspace',
@@ -179,7 +186,11 @@ function registerIpc(): void {
     const owner = ownerWindow(event)
     const result = owner ? await dialog.showOpenDialog(owner, options) : await dialog.showOpenDialog(options)
     if (result.canceled || !result.filePaths[0]) return null
-    return normalizeWorkspace(JSON.parse(readFileSync(result.filePaths[0], 'utf8')))
+    try {
+      return normalizeWorkspace(JSON.parse(readFileSync(result.filePaths[0], 'utf8')))
+    } catch {
+      return null
+    }
   })
   ipcMain.handle('noteberry:reveal-data', async () => shell.openPath(userDataPath()))
   ipcMain.handle('noteberry:confirm', async (event, message: string, detail?: string) => {
@@ -216,9 +227,13 @@ function createWindow(): void {
       preload: join(appRoot(), 'dist/preload/preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
-      sandbox: false,
+      sandbox: true,
+      nodeIntegrationInWorker: false,
+      webviewTag: false,
     },
   })
+  mainWindow.webContents.setWindowOpenHandler(() => ({ action: 'deny' }))
+  mainWindow.webContents.on('will-attach-webview', (event) => event.preventDefault())
   if (isDev) void mainWindow.loadURL(RENDERER_URL)
   else void mainWindow.loadFile(join(appRoot(), 'dist/renderer/index.html'))
 }
@@ -227,6 +242,7 @@ app.whenReady().then(() => {
   session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
     callback({ responseHeaders: { ...details.responseHeaders, 'Content-Security-Policy': [contentSecurityPolicy()] } })
   })
+  session.defaultSession.setPermissionRequestHandler((_wc, _permission, callback) => callback(false))
   registerIpc()
   createWindow()
   app.on('activate', () => { if (BrowserWindow.getAllWindows().length === 0) createWindow() })

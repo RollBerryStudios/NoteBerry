@@ -25,6 +25,7 @@ export interface NoteWorkspace {
 export interface NoteBerryAPI {
   loadWorkspace: () => Promise<NoteWorkspace>
   saveWorkspace: (workspace: NoteWorkspace) => Promise<boolean>
+  saveWorkspaceSync: (workspace: NoteWorkspace) => boolean
   exportWorkspace: (workspace: NoteWorkspace) => Promise<{ success: boolean; filePath?: string; canceled?: boolean }>
   importWorkspace: () => Promise<NoteWorkspace | null>
   revealData: () => Promise<string>
@@ -34,6 +35,7 @@ export interface NoteBerryAPI {
 const api: NoteBerryAPI = {
   loadWorkspace: () => ipcRenderer.invoke('noteberry:workspace-load'),
   saveWorkspace: (workspace) => ipcRenderer.invoke('noteberry:workspace-save', workspace),
+  saveWorkspaceSync: (workspace) => Boolean(ipcRenderer.sendSync('noteberry:workspace-save-sync', workspace)),
   exportWorkspace: (workspace) => ipcRenderer.invoke('noteberry:workspace-export', workspace),
   importWorkspace: () => ipcRenderer.invoke('noteberry:workspace-import'),
   revealData: () => ipcRenderer.invoke('noteberry:reveal-data'),

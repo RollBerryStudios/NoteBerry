@@ -77,6 +77,22 @@ function renderMarkdown(content: string): string {
     .join('')
 }
 
+function buildNoteIndex(notes: VttNote[]) {
+  const tagSet = new Set<string>()
+  const linksById = new Map<string, string[]>()
+  const searchById = new Map<string, string>()
+  for (const note of notes) {
+    for (const tag of note.tags) tagSet.add(tag)
+    linksById.set(note.id, wikiLinks(note.content))
+    searchById.set(note.id, `${note.title} ${note.category} ${note.content} ${note.tags.join(' ')}`.toLowerCase())
+  }
+  return {
+    allTags: Array.from(tagSet).sort(),
+    linksById,
+    searchById,
+  }
+}
+
 export default function App() {
   const [workspace, setWorkspace] = useState<NoteWorkspace>(emptyWorkspace)
   const [ready, setReady] = useState(false)
@@ -85,6 +101,7 @@ export default function App() {
   const [tagFilter, setTagFilter] = useState('__all__')
   const [toast, setToast] = useState<string | null>(null)
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const workspaceRef = useRef(workspace)
 
   const activeNote = workspace.notes.find((note) => note.id === workspace.activeNoteId) ?? workspace.notes[0]
 
@@ -96,27 +113,60 @@ export default function App() {
   }, [])
 
   useEffect(() => {
+    workspaceRef.current = workspace
+  }, [workspace])
+
+  function flushWorkspaceSave(): void {
+    if (!ready) return
+    if (saveTimer.current) {
+      clearTimeout(saveTimer.current)
+      saveTimer.current = null
+    }
+    window.noteberry.saveWorkspaceSync(workspaceRef.current)
+  }
+
+  useEffect(() => {
     if (!ready) return
     if (saveTimer.current) clearTimeout(saveTimer.current)
-    saveTimer.current = setTimeout(() => void window.noteberry.saveWorkspace(workspace), 250)
+    saveTimer.current = setTimeout(() => {
+      saveTimer.current = null
+      void window.noteberry.saveWorkspace(workspace)
+    }, 250)
     return () => { if (saveTimer.current) clearTimeout(saveTimer.current) }
   }, [workspace, ready])
 
-  const allTags = useMemo(() => Array.from(new Set(workspace.notes.flatMap((note) => note.tags))).sort(), [workspace.notes])
-  const links = useMemo(() => wikiLinks(activeNote?.content ?? ''), [activeNote?.content])
+  useEffect(() => {
+    if (!ready) return
+    const flush = () => flushWorkspaceSave()
+    const flushWhenHidden = () => { if (document.visibilityState === 'hidden') flushWorkspaceSave() }
+    window.addEventListener('beforeunload', flush)
+    window.addEventListener('pagehide', flush)
+    document.addEventListener('visibilitychange', flushWhenHidden)
+    return () => {
+      flushWorkspaceSave()
+      window.removeEventListener('beforeunload', flush)
+      window.removeEventListener('pagehide', flush)
+      document.removeEventListener('visibilitychange', flushWhenHidden)
+    }
+  }, [ready])
+
+  const noteIndex = useMemo(() => buildNoteIndex(workspace.notes), [workspace.notes])
+  const allTags = noteIndex.allTags
+  const links = activeNote ? noteIndex.linksById.get(activeNote.id) ?? [] : []
   const backlinks = useMemo(() => {
     if (!activeNote) return []
-    return workspace.notes.filter((note) => note.id !== activeNote.id && wikiLinks(note.content).includes(activeNote.title))
-  }, [activeNote, workspace.notes])
+    return workspace.notes.filter((note) => note.id !== activeNote.id && (noteIndex.linksById.get(note.id) ?? []).includes(activeNote.title))
+  }, [activeNote, noteIndex.linksById, workspace.notes])
+  const renderedPreview = useMemo(() => renderMarkdown(activeNote?.content ?? ''), [activeNote?.content])
 
   const filteredNotes = useMemo(() => {
     const q = search.trim().toLowerCase()
     return workspace.notes
       .filter((note) => category === '__all__' || note.category === category)
       .filter((note) => tagFilter === '__all__' || note.tags.includes(tagFilter))
-      .filter((note) => !q || `${note.title} ${note.category} ${note.content} ${note.tags.join(' ')}`.toLowerCase().includes(q))
+      .filter((note) => !q || (noteIndex.searchById.get(note.id) ?? '').includes(q))
       .sort((a, b) => Number(b.pinned) - Number(a.pinned) || b.updatedAt.localeCompare(a.updatedAt))
-  }, [category, search, tagFilter, workspace.notes])
+  }, [category, noteIndex.searchById, search, tagFilter, workspace.notes])
 
   function notify(message: string): void {
     setToast(message)
@@ -147,10 +197,17 @@ export default function App() {
   }
 
   async function importWorkspace(): Promise<void> {
-    const imported = await window.noteberry.importWorkspace()
-    if (!imported) return
-    setWorkspace(imported)
-    notify('Workspace imported')
+    try {
+      const imported = await window.noteberry.importWorkspace()
+      if (!imported) {
+        notify('Import canceled or invalid')
+        return
+      }
+      setWorkspace(imported)
+      notify('Workspace imported')
+    } catch {
+      notify('Import failed')
+    }
   }
 
   if (!ready || !activeNote) return <div className="loading">Loading NoteBerry...</div>
@@ -250,7 +307,7 @@ export default function App() {
             </section>
             <section className="preview-card">
               <h2>Preview</h2>
-              <div className="markdown-preview" dangerouslySetInnerHTML={{ __html: renderMarkdown(activeNote.content) }} />
+              <div className="markdown-preview" dangerouslySetInnerHTML={{ __html: renderedPreview }} />
             </section>
             <aside className="intel-card">
               <h2>Table Intel</h2>
