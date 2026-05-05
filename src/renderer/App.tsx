@@ -2,6 +2,73 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import type { NoteStatus, NoteVisibility, NoteWorkspace, VttNote } from '../preload/preload'
 import logoUrl from '../../resources/logo.png'
 
+type Locale = 'en' | 'de'
+
+const COPY = {
+  en: {
+    language: 'Language',
+    tagline: 'Rich local notes for virtual tabletop preparation',
+    export: 'Export',
+    import: 'Import',
+    dataFolder: 'Data Folder',
+    notes: 'Notes',
+    entries: 'entries',
+    new: 'New',
+    search: 'Search notes, tags, secrets',
+    allCategories: 'All categories',
+    allTags: 'All tags',
+    pinned: 'Pinned: ',
+    noTags: 'no tags',
+    title: 'Title',
+    category: 'Category',
+    delete: 'Delete',
+    status: 'Status',
+    visibility: 'Visibility',
+    tags: 'Tags',
+    pinnedLabel: 'Pinned',
+    editor: 'Editor',
+    preview: 'Preview',
+    intel: 'Table Intel',
+    todos: 'Todos',
+    links: 'Links',
+    wikiLinks: 'Wiki Links',
+    backlinks: 'Backlinks',
+    noLinks: 'No links',
+    noBacklinks: 'No backlinks',
+  },
+  de: {
+    language: 'Sprache',
+    tagline: 'Lokale Notizen für Vorbereitung und Spielleitung',
+    export: 'Exportieren',
+    import: 'Importieren',
+    dataFolder: 'Datenordner',
+    notes: 'Notizen',
+    entries: 'Einträge',
+    new: 'Neu',
+    search: 'Notizen, Tags, Geheimnisse suchen',
+    allCategories: 'Alle Kategorien',
+    allTags: 'Alle Tags',
+    pinned: 'Angepinnt: ',
+    noTags: 'keine Tags',
+    title: 'Titel',
+    category: 'Kategorie',
+    delete: 'Löschen',
+    status: 'Status',
+    visibility: 'Sichtbarkeit',
+    tags: 'Tags',
+    pinnedLabel: 'Angepinnt',
+    editor: 'Editor',
+    preview: 'Vorschau',
+    intel: 'Tisch-Intel',
+    todos: 'Todos',
+    links: 'Links',
+    wikiLinks: 'Wiki-Links',
+    backlinks: 'Backlinks',
+    noLinks: 'Keine Links',
+    noBacklinks: 'Keine Backlinks',
+  },
+} as const
+
 const CATEGORIES = ['Session', 'NPC', 'Location', 'Quest', 'Item', 'Lore', 'Rules', 'Handout']
 const TEMPLATE_CONTENT: Record<string, string> = {
   NPC: '## Role\n\n## Wants\n\n## Knows\n\n## Voice\n',
@@ -100,10 +167,17 @@ export default function App() {
   const [category, setCategory] = useState('__all__')
   const [tagFilter, setTagFilter] = useState('__all__')
   const [toast, setToast] = useState<string | null>(null)
+  const [locale, setLocaleState] = useState<Locale>(() => localStorage.getItem('noteberry-locale') === 'de' ? 'de' : 'en')
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const workspaceRef = useRef(workspace)
 
   const activeNote = workspace.notes.find((note) => note.id === workspace.activeNoteId) ?? workspace.notes[0]
+  const c = COPY[locale]
+
+  function setLocale(next: Locale): void {
+    setLocaleState(next)
+    localStorage.setItem('noteberry-locale', next)
+  }
 
   useEffect(() => {
     void window.noteberry.loadWorkspace().then((loaded) => {
@@ -219,13 +293,14 @@ export default function App() {
           <img src={logoUrl} alt="" />
           <div>
             <strong>NoteBerry</strong>
-            <span>Rich local notes for virtual tabletop preparation</span>
+            <span>{c.tagline}</span>
           </div>
         </div>
         <div className="titlebar-actions">
-          <button onClick={() => window.noteberry.exportWorkspace(workspace)}>Export</button>
-          <button onClick={importWorkspace}>Import</button>
-          <button onClick={() => window.noteberry.revealData()}>Data Folder</button>
+          <label className="language-select">{c.language}<select aria-label={c.language} value={locale} onChange={(event) => setLocale(event.target.value as Locale)}><option value="en">English</option><option value="de">Deutsch</option></select></label>
+          <button onClick={() => window.noteberry.exportWorkspace(workspace)}>{c.export}</button>
+          <button onClick={importWorkspace}>{c.import}</button>
+          <button onClick={() => window.noteberry.revealData()}>{c.dataFolder}</button>
         </div>
       </header>
 
@@ -233,19 +308,19 @@ export default function App() {
         <aside className="notes-panel">
           <div className="panel-head">
             <div>
-              <h2>Notes</h2>
-              <p>{workspace.notes.length} entries</p>
+              <h2>{c.notes}</h2>
+              <p>{workspace.notes.length} {c.entries}</p>
             </div>
-            <button className="primary" onClick={() => createNote(category === '__all__' ? 'Session' : category)}>New</button>
+            <button className="primary" onClick={() => createNote(category === '__all__' ? 'Session' : category)}>{c.new}</button>
           </div>
           <div className="filters">
-            <input aria-label="Search notes" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search notes, tags, secrets" />
+            <input aria-label="Search notes" value={search} onChange={(event) => setSearch(event.target.value)} placeholder={c.search} />
             <select aria-label="Category filter" value={category} onChange={(event) => setCategory(event.target.value)}>
-              <option value="__all__">All categories</option>
+              <option value="__all__">{c.allCategories}</option>
               {CATEGORIES.map((item) => <option key={item} value={item}>{item}</option>)}
             </select>
             <select aria-label="Tag filter" value={tagFilter} onChange={(event) => setTagFilter(event.target.value)}>
-              <option value="__all__">All tags</option>
+              <option value="__all__">{c.allTags}</option>
               {allTags.map((tag) => <option key={tag} value={tag}>{tag}</option>)}
             </select>
           </div>
@@ -260,8 +335,8 @@ export default function App() {
                 onClick={() => setWorkspace((current) => ({ ...current, activeNoteId: note.id }))}
               >
                 <span className={`visibility ${note.visibility}`}>{note.visibility.toUpperCase()}</span>
-                <strong>{note.pinned ? 'Pinned: ' : ''}{note.title}</strong>
-                <em>{note.category} / {note.status} / {note.tags.join(', ') || 'no tags'}</em>
+                <strong>{note.pinned ? c.pinned : ''}{note.title}</strong>
+                <em>{note.category} / {note.status} / {note.tags.join(', ') || c.noTags}</em>
               </button>
             ))}
           </div>
@@ -270,18 +345,18 @@ export default function App() {
         <section className="editor-panel">
           <div className="editor-head">
             <div className="title-edit">
-              <label>Title<input value={activeNote.title} onChange={(event) => updateActive({ title: event.target.value })} /></label>
-              <label>Category
+              <label>{c.title}<input value={activeNote.title} onChange={(event) => updateActive({ title: event.target.value })} /></label>
+              <label>{c.category}
                 <select value={activeNote.category} onChange={(event) => updateActive({ category: event.target.value })}>
                   {CATEGORIES.map((item) => <option key={item} value={item}>{item}</option>)}
                 </select>
               </label>
             </div>
-            <button className="danger" disabled={workspace.notes.length <= 1} onClick={deleteNote}>Delete</button>
+            <button className="danger" disabled={workspace.notes.length <= 1} onClick={deleteNote}>{c.delete}</button>
           </div>
 
           <div className="meta-strip">
-            <label>Status
+            <label>{c.status}
               <select value={activeNote.status} onChange={(event) => updateActive({ status: event.target.value as NoteStatus })}>
                 <option value="draft">Draft</option>
                 <option value="active">Active</option>
@@ -289,37 +364,37 @@ export default function App() {
                 <option value="archived">Archived</option>
               </select>
             </label>
-            <label>Visibility
+            <label>{c.visibility}
               <select value={activeNote.visibility} onChange={(event) => updateActive({ visibility: event.target.value as NoteVisibility })}>
                 <option value="gm">GM</option>
                 <option value="table">Table</option>
                 <option value="secret">Secret</option>
               </select>
             </label>
-            <label>Tags<input aria-label="Tags" value={activeNote.tags.join(', ')} onChange={(event) => updateActive({ tags: parseTags(event.target.value) })} /></label>
-            <label className="check-line"><input type="checkbox" checked={activeNote.pinned} onChange={(event) => updateActive({ pinned: event.target.checked })} /> Pinned</label>
+            <label>{c.tags}<input aria-label="Tags" value={activeNote.tags.join(', ')} onChange={(event) => updateActive({ tags: parseTags(event.target.value) })} /></label>
+            <label className="check-line"><input type="checkbox" checked={activeNote.pinned} onChange={(event) => updateActive({ pinned: event.target.checked })} /> {c.pinnedLabel}</label>
           </div>
 
           <div className="workbench">
             <section className="editor-card">
-              <h2>Editor</h2>
+              <h2>{c.editor}</h2>
               <textarea aria-label="Note content" value={activeNote.content} onChange={(event) => updateActive({ content: event.target.value })} />
             </section>
             <section className="preview-card">
-              <h2>Preview</h2>
+              <h2>{c.preview}</h2>
               <div className="markdown-preview" dangerouslySetInnerHTML={{ __html: renderedPreview }} />
             </section>
             <aside className="intel-card">
-              <h2>Table Intel</h2>
-              <div className="intel-stat"><span>Todos</span><strong>{todoCount(activeNote.content)}</strong></div>
-              <div className="intel-stat"><span>Links</span><strong>{links.length}</strong></div>
+              <h2>{c.intel}</h2>
+              <div className="intel-stat"><span>{c.todos}</span><strong>{todoCount(activeNote.content)}</strong></div>
+              <div className="intel-stat"><span>{c.links}</span><strong>{links.length}</strong></div>
               <div className="tag-cloud">
                 {activeNote.tags.map((tag) => <button key={tag} onClick={() => setTagFilter(tag)}>{tag}</button>)}
               </div>
-              <h3>Wiki Links</h3>
-              <div className="mini-list">{links.length ? links.map((link) => <span key={link}>{link}</span>) : <em>No links</em>}</div>
-              <h3>Backlinks</h3>
-              <div className="mini-list">{backlinks.length ? backlinks.map((note) => <button key={note.id} onClick={() => setWorkspace((current) => ({ ...current, activeNoteId: note.id }))}>{note.title}</button>) : <em>No backlinks</em>}</div>
+              <h3>{c.wikiLinks}</h3>
+              <div className="mini-list">{links.length ? links.map((link) => <span key={link}>{link}</span>) : <em>{c.noLinks}</em>}</div>
+              <h3>{c.backlinks}</h3>
+              <div className="mini-list">{backlinks.length ? backlinks.map((note) => <button key={note.id} onClick={() => setWorkspace((current) => ({ ...current, activeNoteId: note.id }))}>{note.title}</button>) : <em>{c.noBacklinks}</em>}</div>
             </aside>
           </div>
         </section>

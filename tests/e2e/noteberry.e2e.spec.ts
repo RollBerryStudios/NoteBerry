@@ -24,6 +24,21 @@ test.describe('NoteBerry Electron QA', () => {
     }
   })
 
+  test('switches the note workspace UI to German', async ({}, testInfo) => {
+    const { app, page } = await launchNoteBerry(testInfo)
+    try {
+      await page.getByLabel('Language').selectOption('de')
+      await expect(page.getByRole('heading', { name: 'Notizen' })).toBeVisible()
+      await expect(page.getByRole('heading', { name: 'Vorschau' })).toBeVisible()
+      await expect(page.getByRole('button', { name: 'Exportieren' })).toBeVisible()
+      await expect(page.getByPlaceholder('Notizen, Tags, Geheimnisse suchen')).toBeVisible()
+      await assertVisibleLayout(page)
+      await assertNoUnexpectedOverlaps(page)
+    } finally {
+      await app.close()
+    }
+  })
+
   test('searches, filters categories and tags, and follows backlinks', async ({}, testInfo) => {
     const { app, page } = await launchNoteBerry(testInfo)
     try {
