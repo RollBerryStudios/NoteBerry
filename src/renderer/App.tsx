@@ -17,6 +17,7 @@ const COPY = {
     search: 'Search notes, tags, secrets',
     allCategories: 'All categories',
     allTags: 'All tags',
+    allVisibility: 'All visibility',
     pinned: 'Pinned: ',
     noTags: 'no tags',
     title: 'Title',
@@ -48,6 +49,7 @@ const COPY = {
     search: 'Notizen, Tags, Geheimnisse suchen',
     allCategories: 'Alle Kategorien',
     allTags: 'Alle Tags',
+    allVisibility: 'Alle Sichtbarkeiten',
     pinned: 'Angepinnt: ',
     noTags: 'keine Tags',
     title: 'Titel',
@@ -166,6 +168,7 @@ export default function App() {
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('__all__')
   const [tagFilter, setTagFilter] = useState('__all__')
+  const [visibilityFilter, setVisibilityFilter] = useState<'__all__' | NoteVisibility>('__all__')
   const [toast, setToast] = useState<string | null>(null)
   const [locale, setLocaleState] = useState<Locale>(() => localStorage.getItem('noteberry-locale') === 'de' ? 'de' : 'en')
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -238,9 +241,10 @@ export default function App() {
     return workspace.notes
       .filter((note) => category === '__all__' || note.category === category)
       .filter((note) => tagFilter === '__all__' || note.tags.includes(tagFilter))
+      .filter((note) => visibilityFilter === '__all__' || note.visibility === visibilityFilter)
       .filter((note) => !q || (noteIndex.searchById.get(note.id) ?? '').includes(q))
       .sort((a, b) => Number(b.pinned) - Number(a.pinned) || b.updatedAt.localeCompare(a.updatedAt))
-  }, [category, noteIndex.searchById, search, tagFilter, workspace.notes])
+  }, [category, noteIndex.searchById, search, tagFilter, visibilityFilter, workspace.notes])
 
   function notify(message: string): void {
     setToast(message)
@@ -322,6 +326,12 @@ export default function App() {
             <select aria-label="Tag filter" value={tagFilter} onChange={(event) => setTagFilter(event.target.value)}>
               <option value="__all__">{c.allTags}</option>
               {allTags.map((tag) => <option key={tag} value={tag}>{tag}</option>)}
+            </select>
+            <select aria-label="Visibility filter" value={visibilityFilter} onChange={(event) => setVisibilityFilter(event.target.value as '__all__' | NoteVisibility)}>
+              <option value="__all__">{c.allVisibility}</option>
+              <option value="gm">GM</option>
+              <option value="table">Table</option>
+              <option value="secret">Secret</option>
             </select>
           </div>
           <div className="template-row">
