@@ -15,6 +15,9 @@ test.describe('NoteBerry Electron QA', () => {
       await expect(page.locator('.markdown-preview')).toContainText('Reveal the cracked bell clue')
       await expect(page.locator('.intel-stat', { hasText: 'Todos' })).toContainText('1')
       await expect(page.locator('.intel-stat', { hasText: 'Links' })).toContainText('1')
+      await expect.poll(() => page.locator('.brand img').evaluate((img) => (img as HTMLImageElement).naturalWidth)).toBeGreaterThan(0)
+      await assertVisibleLayout(page)
+      await assertNoUnexpectedOverlaps(page)
       await expect(page).toHaveScreenshot('noteberry-workspace-desktop.png', { fullPage: true })
     } finally {
       await app.close()
@@ -34,6 +37,39 @@ test.describe('NoteBerry Electron QA', () => {
       await page.locator('.note-card', { hasText: 'Archivist Nara' }).click()
       await expect(page.locator('.mini-list').last()).toContainText('Session 7: Clocktower')
       await expect(page.locator('.markdown-preview')).toContainText('Session 7: Clocktower')
+
+      await page.getByLabel('Search notes').fill('')
+      await page.getByLabel('Category filter').selectOption('__all__')
+      await page.getByLabel('Tag filter').selectOption('clocktower')
+      await expect(page.locator('.note-card')).toHaveCount(2)
+      await page.locator('.tag-cloud').getByRole('button', { name: 'npc' }).click()
+      await expect(page.getByLabel('Tag filter')).toHaveValue('npc')
+      await expect(page.locator('.note-card')).toHaveCount(1)
+    } finally {
+      await app.close()
+    }
+  })
+
+  test('creates each VTT template and validates default category, tags, and starter structure', async ({}, testInfo) => {
+    const { app, page, workspacePath } = await launchNoteBerry(testInfo)
+    try {
+      const expectations = [
+        { button: 'NPC', title: 'New NPC', content: '## Role', tag: 'npc' },
+        { button: 'Location', title: 'New Location', content: '## First Impression', tag: 'location' },
+        { button: 'Quest', title: 'New Quest', content: '## Hook', tag: 'quest' },
+        { button: 'Session', title: 'New Session', content: '# Session Notes', tag: 'session' },
+      ]
+      for (const item of expectations) {
+        await page.locator('.template-row').getByRole('button', { name: item.button }).click()
+        await expect(page.getByLabel('Title')).toHaveValue(item.title)
+        await expect(page.locator('.title-edit select')).toHaveValue(item.button)
+        await expect(page.getByLabel('Tags')).toHaveValue(item.tag)
+        await expect(page.getByLabel('Note content')).toContainText(item.content)
+        await assertVisibleLayout(page)
+        await assertNoUnexpectedOverlaps(page)
+      }
+      await expect(page).toHaveScreenshot('noteberry-template-stack-desktop.png', { fullPage: true })
+      await expect.poll(() => readSavedWorkspace(workspacePath).notes.length).toBe(6)
     } finally {
       await app.close()
     }
@@ -47,10 +83,17 @@ test.describe('NoteBerry Electron QA', () => {
       await page.getByLabel('Tags').fill('npc, harbor, ally')
       await page.getByLabel('Visibility').selectOption('table')
       await page.getByLabel('Status').selectOption('active')
-      await page.getByLabel('Note content').fill('## Role\n\nHarbor captain who knows [[Hidden Pier]].\n- TODO: Add voice cue.')
+      await page.getByLabel('Note content').fill('## Role\n\nHarbor captain who knows [[Hidden Pier]].\n- TODO: Add **voice cue** and `dock smell`.\n\n*Trusted* by sailors.')
       await expect(page.locator('.markdown-preview')).toContainText('Harbor captain')
+      await expect(page.locator('.markdown-preview mark')).toContainText('Hidden Pier')
+      await expect(page.locator('.markdown-preview strong')).toContainText('voice cue')
+      await expect(page.locator('.markdown-preview code')).toContainText('dock smell')
+      await expect(page.locator('.markdown-preview em')).toContainText('Trusted')
       await expect(page.locator('.intel-stat', { hasText: 'Todos' })).toContainText('1')
       await expect(page.locator('.intel-stat', { hasText: 'Links' })).toContainText('1')
+      await assertVisibleLayout(page)
+      await assertNoUnexpectedOverlaps(page)
+      await expect(page).toHaveScreenshot('noteberry-markdown-edited-desktop.png', { fullPage: true })
 
       await expect.poll(() => {
         const saved = readSavedWorkspace(workspacePath)
@@ -63,6 +106,31 @@ test.describe('NoteBerry Electron QA', () => {
           status: active?.status,
         }
       }).toEqual({ count: 3, title: 'Captain Morn', tags: ['npc', 'harbor', 'ally'], visibility: 'table', status: 'active' })
+    } finally {
+      await app.close()
+    }
+  })
+
+  test('updates pinning, status, visibility states, and note ordering', async ({}, testInfo) => {
+    const { app, page, workspacePath } = await launchNoteBerry(testInfo)
+    try {
+      await page.locator('.note-card', { hasText: 'Archivist Nara' }).click()
+      await page.getByLabel('Status').selectOption('resolved')
+      await page.getByLabel('Visibility').selectOption('table')
+      await page.locator('.meta-strip .check-line input').check()
+      await expect(page.locator('.note-card').first()).toContainText('Pinned: Archivist Nara')
+      await expect(page.locator('.note-card').first()).toContainText('TABLE')
+
+      await page.getByLabel('Visibility').selectOption('secret')
+      await expect(page.locator('.note-card').first()).toContainText('SECRET')
+      await page.getByLabel('Status').selectOption('archived')
+      await expect(page.locator('.note-card').first()).toContainText('archived')
+      await expect(page).toHaveScreenshot('noteberry-state-ordering-desktop.png', { fullPage: true })
+
+      await expect.poll(() => {
+        const nara = readSavedWorkspace(workspacePath).notes.find((note) => note.id === 'note-nara')
+        return { pinned: nara?.pinned, visibility: nara?.visibility, status: nara?.status }
+      }).toEqual({ pinned: true, visibility: 'secret', status: 'archived' })
     } finally {
       await app.close()
     }
@@ -101,11 +169,19 @@ test.describe('NoteBerry Electron QA', () => {
     const { app, page } = await launchNoteBerry(testInfo, { workspace: sampleWorkspace() })
     try {
       await assertVisibleLayout(page)
+      await assertNoUnexpectedOverlaps(page)
       await expect(page).toHaveScreenshot('noteberry-desktop-layout.png', { fullPage: true })
       await page.setViewportSize({ width: 900, height: 980 })
       await page.waitForTimeout(100)
       await assertVisibleLayout(page)
+      await assertNoUnexpectedOverlaps(page)
       await expect(page).toHaveScreenshot('noteberry-responsive-layout.png', { fullPage: true })
+
+      await page.locator('.template-row').getByRole('button', { name: 'Quest' }).click()
+      await page.getByLabel('Note content').fill('## Hook\n\nA patron knows [[Old Mill]].\n- TODO: Add reward.\n- [ ] Confirm villain motive.')
+      await assertVisibleLayout(page)
+      await assertNoUnexpectedOverlaps(page)
+      await expect(page).toHaveScreenshot('noteberry-responsive-editor-detail.png', { fullPage: true })
     } finally {
       await app.close()
     }
@@ -128,6 +204,48 @@ async function assertVisibleLayout(page: import('@playwright/test').Page): Promi
         if (rect.width <= 0 || rect.height <= 0) result.push(`${selector} has empty bounds`)
         if (rect.left < -1 || rect.right > viewport.width + 1) result.push(`${selector} overflows horizontally`)
         if (element instanceof HTMLButtonElement && element.scrollWidth > element.clientWidth + 2) result.push(`button text clips: ${element.textContent?.trim()}`)
+      }
+    }
+    return result
+  })
+  expect(failures).toEqual([])
+}
+
+async function assertNoUnexpectedOverlaps(page: import('@playwright/test').Page): Promise<void> {
+  const failures = await page.evaluate(() => {
+    const groups = [
+      '.titlebar > *',
+      '.filters > *',
+      '.template-row > button',
+      '.note-list > .note-card',
+      '.editor-head > *',
+      '.title-edit > label',
+      '.meta-strip > label',
+      '.workbench > *',
+      '.tag-cloud > button',
+      '.mini-list > *',
+    ]
+    const result: string[] = []
+    function visibleRect(element: Element): DOMRect | null {
+      const style = window.getComputedStyle(element)
+      if (style.display === 'none' || style.visibility === 'hidden') return null
+      const rect = element.getBoundingClientRect()
+      if (rect.width <= 0 || rect.height <= 0) return null
+      return rect
+    }
+    function overlap(a: DOMRect, b: DOMRect): boolean {
+      return Math.max(a.left, b.left) < Math.min(a.right, b.right) - 1 && Math.max(a.top, b.top) < Math.min(a.bottom, b.bottom) - 1
+    }
+    for (const group of groups) {
+      const items = Array.from(document.querySelectorAll(group))
+        .map((element) => ({ element, rect: visibleRect(element) }))
+        .filter((item): item is { element: Element; rect: DOMRect } => item.rect !== null)
+      for (let i = 0; i < items.length; i++) {
+        for (let j = i + 1; j < items.length; j++) {
+          if (overlap(items[i].rect, items[j].rect)) {
+            result.push(`${group} overlap: "${items[i].element.textContent?.trim().slice(0, 30)}" with "${items[j].element.textContent?.trim().slice(0, 30)}"`)
+          }
+        }
       }
     }
     return result

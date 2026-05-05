@@ -5,15 +5,25 @@
 The Playwright Electron suite covers the first production slice of NoteBerry:
 
 - first render, title, logo, note list, editor, preview, and table intel
+- transparent logo rendering in the app chrome
 - category, tag, and full-text search filters
 - template note creation
+- all visible VTT template buttons: NPC, Location, Quest, and Session
 - metadata editing for status, visibility, tags, and pin state
+- pinned-note ordering
 - markdown preview for headings, bullets, emphasis, code, and wiki links
 - TODO counting, wiki link listing, and backlink navigation
+- tag-chip filter interactions
 - autosave persistence into `data/noteberry-workspace.json`
 - damaged local data normalization
 - desktop and narrow viewport screenshot baselines
-- basic horizontal overflow, empty bounds, and button clipping checks
+- desktop, state-ordering, markdown-edited, template-stack, and responsive editor screenshots
+- basic horizontal overflow, empty bounds, button clipping, and sibling-overlap checks
+
+Current suite size:
+
+- 7 Playwright Electron tests
+- 7 screenshot baselines
 
 ## Commands
 
