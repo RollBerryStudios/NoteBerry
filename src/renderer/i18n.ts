@@ -1,0 +1,558 @@
+import type { NoteStatus, NoteVisibility } from '../preload/preload'
+
+export type Locale = 'en' | 'de'
+export type NoteCategory = 'Session' | 'NPC' | 'Location' | 'Quest' | 'Item' | 'Lore' | 'Rules' | 'Handout'
+
+export const CATEGORIES: NoteCategory[] = ['Session', 'NPC', 'Location', 'Quest', 'Item', 'Lore', 'Rules', 'Handout']
+
+export type NoteCopy = {
+  language: string
+  settings: string
+  appearance: string
+  theme: string
+  darkMode: string
+  lightMode: string
+  community: string
+  githubRepo: string
+  rollberryTitle: string
+  rollberryInfo: string
+  rollberryGithub: string
+  close: string
+  tagline: string
+  export: string
+  import: string
+  dataFolder: string
+  notes: string
+  entries: string
+  new: string
+  search: string
+  allCategories: string
+  allTags: string
+  allVisibility: string
+  templates: string
+  pinned: string
+  noTags: string
+  title: string
+  category: string
+  delete: string
+  status: string
+  visibility: string
+  tags: string
+  pinnedLabel: string
+  editor: string
+  preview: string
+  intel: string
+  todos: string
+  links: string
+  wikiLinks: string
+  backlinks: string
+  noLinks: string
+  noBacklinks: string
+  searchNotes: string
+  categoryFilter: string
+  tagFilter: string
+  visibilityFilter: string
+  noteContent: string
+  importInvalid: string
+  workspaceImported: string
+  importFailed: string
+  deleteConfirm: (title: string) => string
+  deleteDetail: string
+  newTitle: (category: string) => string
+}
+
+export const COPY: Record<Locale, NoteCopy> = {
+  en: {
+    language: 'Language',
+    settings: 'Settings',
+    appearance: 'Appearance',
+    theme: 'Theme',
+    darkMode: 'Dark',
+    lightMode: 'Light',
+    community: 'Community',
+    githubRepo: 'GitHub repository',
+    rollberryTitle: 'RollBerry Studios',
+    rollberryInfo: 'Local-first tabletop tools for game masters and players.',
+    rollberryGithub: 'RollBerry Studios on GitHub',
+    close: 'Close',
+    tagline: 'Fast D&D notes for prep and play',
+    export: 'Export',
+    import: 'Import',
+    dataFolder: 'Data Folder',
+    notes: 'Notes',
+    entries: 'entries',
+    new: 'New',
+    search: 'Search notes, tags, secrets',
+    allCategories: 'All categories',
+    allTags: 'All tags',
+    allVisibility: 'All visibility',
+    templates: 'Templates',
+    pinned: 'Pinned: ',
+    noTags: 'no tags',
+    title: 'Title',
+    category: 'Category',
+    delete: 'Delete',
+    status: 'Status',
+    visibility: 'Visibility',
+    tags: 'Tags',
+    pinnedLabel: 'Pinned',
+    editor: 'Editor',
+    preview: 'Preview',
+    intel: 'Table Intel',
+    todos: 'Todos',
+    links: 'Links',
+    wikiLinks: 'Wiki Links',
+    backlinks: 'Backlinks',
+    noLinks: 'No links',
+    noBacklinks: 'No backlinks',
+    searchNotes: 'Search notes',
+    categoryFilter: 'Category filter',
+    tagFilter: 'Tag filter',
+    visibilityFilter: 'Visibility filter',
+    noteContent: 'Note content',
+    importInvalid: 'Import canceled or invalid',
+    workspaceImported: 'Workspace imported',
+    importFailed: 'Import failed',
+    deleteConfirm: (title) => `Delete "${title}"?`,
+    deleteDetail: 'This removes the note from the local NoteBerry workspace.',
+    newTitle: (category) => `New ${category}`,
+  },
+  de: {
+    language: 'Sprache',
+    settings: 'Einstellungen',
+    appearance: 'Darstellung',
+    theme: 'Design',
+    darkMode: 'Dunkel',
+    lightMode: 'Hell',
+    community: 'Community',
+    githubRepo: 'GitHub-Repository',
+    rollberryTitle: 'RollBerry Studios',
+    rollberryInfo: 'Lokale Tabletop-Tools für Spielleitungen und Spieler.',
+    rollberryGithub: 'RollBerry Studios auf GitHub',
+    close: 'Schließen',
+    tagline: 'Schnelle D&D-Notizen für Vorbereitung und Spiel',
+    export: 'Exportieren',
+    import: 'Importieren',
+    dataFolder: 'Datenordner',
+    notes: 'Notizen',
+    entries: 'Einträge',
+    new: 'Neu',
+    search: 'Notizen, Tags, Geheimnisse suchen',
+    allCategories: 'Alle Kategorien',
+    allTags: 'Alle Tags',
+    allVisibility: 'Alle Sichtbarkeiten',
+    templates: 'Vorlagen',
+    pinned: 'Angepinnt: ',
+    noTags: 'keine Tags',
+    title: 'Titel',
+    category: 'Kategorie',
+    delete: 'Löschen',
+    status: 'Status',
+    visibility: 'Sichtbarkeit',
+    tags: 'Tags',
+    pinnedLabel: 'Angepinnt',
+    editor: 'Editor',
+    preview: 'Vorschau',
+    intel: 'Tisch-Intel',
+    todos: 'Todos',
+    links: 'Links',
+    wikiLinks: 'Wiki-Links',
+    backlinks: 'Backlinks',
+    noLinks: 'Keine Links',
+    noBacklinks: 'Keine Backlinks',
+    searchNotes: 'Notizen suchen',
+    categoryFilter: 'Kategorie-Filter',
+    tagFilter: 'Tag-Filter',
+    visibilityFilter: 'Sichtbarkeits-Filter',
+    noteContent: 'Notizinhalt',
+    importInvalid: 'Import abgebrochen oder ungültig',
+    workspaceImported: 'Workspace importiert',
+    importFailed: 'Import fehlgeschlagen',
+    deleteConfirm: (title) => `"${title}" löschen?`,
+    deleteDetail: 'Diese Notiz wird aus dem lokalen NoteBerry-Workspace entfernt.',
+    newTitle: (category) => `Neue Notiz: ${categoryLabel('de', category)}`,
+  },
+}
+
+const CATEGORY_LABELS: Record<Locale, Record<string, string>> = {
+  en: {
+    Session: 'Session',
+    NPC: 'NPC',
+    Location: 'Location',
+    Quest: 'Quest',
+    Item: 'Item',
+    Lore: 'Lore',
+    Rules: 'Rules',
+    Handout: 'Handout',
+  },
+  de: {
+    Session: 'Sitzung',
+    NPC: 'NSC',
+    Location: 'Ort',
+    Quest: 'Quest',
+    Item: 'Gegenstand',
+    Lore: 'Lore',
+    Rules: 'Regeln',
+    Handout: 'Handout',
+  },
+}
+
+const CATEGORY_HINTS: Record<Locale, Record<NoteCategory, string>> = {
+  en: {
+    Session: 'Prep flow',
+    NPC: 'People',
+    Location: 'Places',
+    Quest: 'Hooks',
+    Item: 'Treasure',
+    Lore: 'Secrets',
+    Rules: 'Rulings',
+    Handout: 'Player text',
+  },
+  de: {
+    Session: 'Ablauf',
+    NPC: 'Figuren',
+    Location: 'Orte',
+    Quest: 'Aufträge',
+    Item: 'Schätze',
+    Lore: 'Geheimnisse',
+    Rules: 'Regeln',
+    Handout: 'Spielertext',
+  },
+}
+
+const STATUS_LABELS: Record<Locale, Record<NoteStatus, string>> = {
+  en: { draft: 'Draft', active: 'Active', resolved: 'Resolved', archived: 'Archived' },
+  de: { draft: 'Entwurf', active: 'Aktiv', resolved: 'Erledigt', archived: 'Archiviert' },
+}
+
+const VISIBILITY_LABELS: Record<Locale, Record<NoteVisibility, string>> = {
+  en: { gm: 'GM', table: 'Table', secret: 'Secret' },
+  de: { gm: 'SL', table: 'Tisch', secret: 'Geheim' },
+}
+
+const TEMPLATE_CONTENT: Record<Locale, Partial<Record<NoteCategory, string>>> = {
+  en: {
+    Session: `# Session Notes
+
+## Before Play
+- Date:
+- Party level:
+- Recap:
+- Opening scene:
+- Key scenes:
+- Secrets and clues:
+- NPCs:
+- Locations:
+- Treasure:
+- TODO:
+
+## During Play
+- Decisions:
+- Damage, conditions, resources:
+- Improvised names:
+- New questions:
+
+## After Play
+- XP or milestone:
+- Faction changes:
+- Loose threads:
+`,
+    NPC: `# NPC
+
+## At a Glance
+- Role:
+- Pronouns:
+- Species / class:
+- Appearance:
+- Avatar image:
+- Voice or mannerism:
+
+## Motivation
+- Wants:
+- Fears:
+- Secret:
+- Leverage:
+
+## At the Table
+- Knows:
+- Quest hook:
+- Stat block:
+- Relationship to party:
+- TODO:
+`,
+    Location: `# Location
+
+## First Impression
+- Sight:
+- Sound:
+- Smell:
+- Mood:
+- Map or image:
+
+## Gameplay
+- Points of interest:
+- NPCs:
+- Encounters:
+- Treasure:
+- Secrets and clues:
+- Hazards:
+- Exits:
+`,
+    Quest: `# Quest
+
+## Hook
+- Who offers it:
+- Why now:
+- What the party sees first:
+
+## Objective
+- Goal:
+- Stakes:
+- Deadline:
+- Failure consequence:
+
+## Path
+- Clue 1:
+- Clue 2:
+- Complication:
+- Optional twist:
+
+## Reward
+- Gold / item:
+- Favor:
+- New lead:
+`,
+    Item: `# Item
+
+## Appearance
+- Description:
+- Avatar image:
+- Owner:
+- Tell:
+
+## Mechanics
+- Rarity:
+- Attunement:
+- Effect:
+- Charges / limits:
+- Curse or cost:
+
+## Story
+- Origin:
+- Who wants it:
+- Clue it reveals:
+`,
+    Lore: `# Lore
+
+## Truth
+- What is true:
+- What people believe:
+- What is hidden:
+- Why it matters:
+
+## Reveal Plan
+- Clue:
+- Source:
+- Related notes:
+- Consequence if ignored:
+`,
+    Rules: `# Rule / Ruling
+
+## Situation
+- Trigger:
+- Source:
+- Table ruling:
+
+## Use at the Table
+- Quick version:
+- Edge cases:
+- Example:
+- Revisit after:
+`,
+    Handout: `# Handout
+
+## Player-Facing Text
+
+
+## GM Notes
+- Delivery:
+- Hidden meaning:
+- Image or prop:
+- Related quest:
+- What changes after reading:
+`,
+  },
+  de: {
+    Session: `# Sitzungsnotizen
+
+## Vor dem Spiel
+- Datum:
+- Gruppenstufe:
+- Rückblick:
+- Einstiegsszene:
+- Schlüsselszenen:
+- Geheimnisse und Hinweise:
+- NSCs:
+- Orte:
+- Schätze:
+- TODO:
+
+## Während des Spiels
+- Entscheidungen:
+- Schaden, Zustände, Ressourcen:
+- Improvisierte Namen:
+- Neue Fragen:
+
+## Nach dem Spiel
+- EP oder Meilenstein:
+- Fraktionsänderungen:
+- Offene Fäden:
+`,
+    NPC: `# NSC
+
+## Auf einen Blick
+- Rolle:
+- Pronomen:
+- Spezies / Klasse:
+- Erscheinung:
+- Avatar-Bild:
+- Stimme oder Eigenart:
+
+## Motivation
+- Will:
+- Fürchtet:
+- Geheimnis:
+- Druckmittel:
+
+## Am Tisch
+- Weiß:
+- Quest-Aufhänger:
+- Statblock:
+- Beziehung zur Gruppe:
+- TODO:
+`,
+    Location: `# Ort
+
+## Erster Eindruck
+- Anblick:
+- Geräusch:
+- Geruch:
+- Stimmung:
+- Karte oder Bild:
+
+## Spielwert
+- Interessante Punkte:
+- NSCs:
+- Begegnungen:
+- Schätze:
+- Geheimnisse und Hinweise:
+- Gefahren:
+- Ausgänge:
+`,
+    Quest: `# Quest
+
+## Aufhänger
+- Wer bietet sie an:
+- Warum jetzt:
+- Was die Gruppe zuerst sieht:
+
+## Ziel
+- Aufgabe:
+- Einsatz:
+- Frist:
+- Folge bei Scheitern:
+
+## Verlauf
+- Hinweis 1:
+- Hinweis 2:
+- Komplikation:
+- Optionale Wendung:
+
+## Belohnung
+- Gold / Gegenstand:
+- Gefallen:
+- Neue Spur:
+`,
+    Item: `# Gegenstand
+
+## Erscheinung
+- Beschreibung:
+- Avatar-Bild:
+- Besitzer:
+- Wiedererkennungsmerkmal:
+
+## Mechanik
+- Seltenheit:
+- Einstimmung:
+- Effekt:
+- Ladungen / Grenzen:
+- Fluch oder Preis:
+
+## Geschichte
+- Ursprung:
+- Wer ihn will:
+- Welchen Hinweis er liefert:
+`,
+    Lore: `# Lore
+
+## Wahrheit
+- Was stimmt:
+- Was die Leute glauben:
+- Was verborgen ist:
+- Warum es wichtig ist:
+
+## Enthüllung
+- Hinweis:
+- Quelle:
+- Verknüpfte Notizen:
+- Folge, wenn ignoriert:
+`,
+    Rules: `# Regel / Entscheidung
+
+## Situation
+- Auslöser:
+- Quelle:
+- Tischentscheidung:
+
+## Am Tisch nutzen
+- Kurzfassung:
+- Sonderfälle:
+- Beispiel:
+- Nachbesprechen nach:
+`,
+    Handout: `# Handout
+
+## Text für die Spieler
+
+
+## SL-Notizen
+- Übergabe:
+- Versteckte Bedeutung:
+- Bild oder Requisite:
+- Verknüpfte Quest:
+- Was sich danach ändert:
+`,
+  },
+}
+
+export function categoryLabel(locale: Locale, category: string): string {
+  return CATEGORY_LABELS[locale][category] ?? category
+}
+
+export function categoryHint(locale: Locale, category: string): string {
+  const noteCategory = CATEGORIES.includes(category as NoteCategory) ? category as NoteCategory : 'Session'
+  return CATEGORY_HINTS[locale][noteCategory]
+}
+
+export function statusLabel(locale: Locale, status: NoteStatus): string {
+  return STATUS_LABELS[locale][status]
+}
+
+export function visibilityLabel(locale: Locale, visibility: NoteVisibility): string {
+  return VISIBILITY_LABELS[locale][visibility]
+}
+
+export function templateContent(locale: Locale, category: string): string {
+  const noteCategory = CATEGORIES.includes(category as NoteCategory) ? category as NoteCategory : 'Session'
+  return TEMPLATE_CONTENT[locale][noteCategory] ?? TEMPLATE_CONTENT.en[noteCategory] ?? ''
+}

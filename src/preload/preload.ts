@@ -29,6 +29,7 @@ export interface NoteBerryAPI {
   exportWorkspace: (workspace: NoteWorkspace) => Promise<{ success: boolean; filePath?: string; canceled?: boolean }>
   importWorkspace: () => Promise<NoteWorkspace | null>
   revealData: () => Promise<string>
+  openExternal: (url: string) => Promise<boolean>
   confirm: (message: string, detail?: string) => Promise<boolean>
 }
 
@@ -39,6 +40,7 @@ const api: NoteBerryAPI = {
   exportWorkspace: (workspace) => ipcRenderer.invoke('noteberry:workspace-export', workspace),
   importWorkspace: () => ipcRenderer.invoke('noteberry:workspace-import'),
   revealData: () => ipcRenderer.invoke('noteberry:reveal-data'),
+  openExternal: (url) => ipcRenderer.invoke('noteberry:open-external', url),
   confirm: (message, detail) => ipcRenderer.invoke('noteberry:confirm', message, detail),
 }
 

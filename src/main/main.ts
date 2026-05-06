@@ -98,7 +98,7 @@ function defaultWorkspace(): NoteWorkspace {
       id: makeId(),
       title: 'Session 1: The Missing Cart',
       category: 'Session',
-      content: '# Session 1\n\n- Party meets at the old bridge.\n- [[Mayor Elen]] asks for help.\n- TODO: Prepare forest ambush clues.\n\nSecret: the cart was moved to the mill cellar.',
+      content: '# Session Notes\n\n## Before Play\n- Recap: The party arrives at Brindleford after a storm.\n- Opening scene: A broken cart blocks the old bridge.\n- Secrets and clues: [[Mayor Elen]] moved the cargo to the mill cellar.\n- NPCs: [[Mayor Elen]]\n- Locations: Old Bridge, Mill Cellar\n- TODO: Prepare forest ambush clues.\n\n## During Play\n- Decisions:\n- Improvised names:\n\n## After Play\n- Loose threads:',
       tags: ['session', 'quest'],
       status: 'active',
       visibility: 'gm',
@@ -110,7 +110,7 @@ function defaultWorkspace(): NoteWorkspace {
       id: makeId(),
       title: 'Mayor Elen',
       category: 'NPC',
-      content: 'Careful speaker, keeps a silver raven pin. Knows more about the missing cart than she admits.',
+      content: '# NPC\n\n## At a Glance\n- Role: Mayor of Brindleford\n- Appearance: Careful speaker, silver raven pin, ink-stained gloves.\n- Avatar image:\n- Voice or mannerism: Measures each sentence before speaking.\n\n## Motivation\n- Wants: Keep the town calm.\n- Fears: The mill cellar will be searched.\n- Secret: Knows more about the missing cart than she admits.\n\n## At the Table\n- Knows: Who last guarded the bridge.\n- Quest hook: Asks the party to recover the missing cargo.',
       tags: ['npc', 'town'],
       status: 'active',
       visibility: 'gm',
@@ -149,6 +149,18 @@ function loadWorkspace(): NoteWorkspace {
 function saveWorkspace(workspace: NoteWorkspace): boolean {
   writeFileSync(workspacePath(), JSON.stringify(normalizeWorkspace(workspace), null, 2), 'utf8')
   return true
+}
+
+function safeExternalUrl(value: unknown): string | null {
+  if (typeof value !== 'string') return null
+  try {
+    const url = new URL(value)
+    if (url.protocol !== 'https:' || url.hostname !== 'github.com') return null
+    if (url.pathname !== '/RollBerryStudios' && !url.pathname.startsWith('/RollBerryStudios/')) return null
+    return url.toString()
+  } catch {
+    return null
+  }
 }
 
 function ownerWindow(event: IpcMainInvokeEvent): BrowserWindow | null {
@@ -193,6 +205,12 @@ function registerIpc(): void {
     }
   })
   ipcMain.handle('noteberry:reveal-data', async () => shell.openPath(userDataPath()))
+  ipcMain.handle('noteberry:open-external', async (_event, url: string) => {
+    const safeUrl = safeExternalUrl(url)
+    if (!safeUrl) return false
+    await shell.openExternal(safeUrl)
+    return true
+  })
   ipcMain.handle('noteberry:confirm', async (event, message: string, detail?: string) => {
     const options = {
       type: 'question',

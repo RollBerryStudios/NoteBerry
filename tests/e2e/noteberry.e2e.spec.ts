@@ -7,6 +7,9 @@ test.describe('NoteBerry Electron QA', () => {
     try {
       await expect(page).toHaveTitle('NoteBerry')
       await expect(page.locator('.brand img')).toBeVisible()
+      await expect(page.getByRole('button', { name: 'Einstellungen' })).toBeVisible()
+      await switchToEnglish(page)
+      await expect(page.locator('.brand span')).toHaveText('Fast D&D notes for prep and play')
       await expect(page.getByRole('heading', { name: 'Notes' })).toBeVisible()
       await expect(page.getByText('Session 7: Clocktower')).toBeVisible()
       await expect(page.getByRole('heading', { name: 'Editor' })).toBeVisible()
@@ -24,14 +27,24 @@ test.describe('NoteBerry Electron QA', () => {
     }
   })
 
-  test('switches the note workspace UI to German', async ({}, testInfo) => {
+  test('opens settings with German dark defaults and keeps German templates usable', async ({}, testInfo) => {
     const { app, page } = await launchNoteBerry(testInfo)
     try {
-      await page.getByLabel('Language').selectOption('de')
       await expect(page.getByRole('heading', { name: 'Notizen' })).toBeVisible()
       await expect(page.getByRole('heading', { name: 'Vorschau' })).toBeVisible()
       await expect(page.getByRole('button', { name: 'Exportieren' })).toBeVisible()
       await expect(page.getByPlaceholder('Notizen, Tags, Geheimnisse suchen')).toBeVisible()
+      await page.getByRole('button', { name: 'Einstellungen' }).click()
+      await expect(page.getByRole('dialog', { name: 'Einstellungen' })).toBeVisible()
+      await expect(page.getByLabel('Sprache')).toHaveValue('de')
+      await expect(page.getByLabel('Design')).toHaveValue('dark')
+      await expect(page.getByRole('button', { name: 'GitHub-Repository' })).toBeVisible()
+      await expect(page.getByRole('button', { name: 'RollBerry Studios auf GitHub' })).toBeVisible()
+      await page.getByLabel('Design').selectOption('light')
+      await page.getByRole('button', { name: 'Schließen' }).click()
+      await page.locator('.template-row').getByRole('button', { name: 'NSC' }).click()
+      await expect(page.getByLabel('Titel')).toHaveValue('Neue Notiz: NSC')
+      await expect(page.getByLabel('Notizinhalt')).toContainText('## Auf einen Blick')
       await assertVisibleLayout(page)
       await assertNoUnexpectedOverlaps(page)
     } finally {
@@ -42,6 +55,7 @@ test.describe('NoteBerry Electron QA', () => {
   test('searches, filters categories and tags, and follows backlinks', async ({}, testInfo) => {
     const { app, page } = await launchNoteBerry(testInfo)
     try {
+      await switchToEnglish(page)
       await page.getByLabel('Search notes').fill('nara')
       await expect(page.locator('.note-card')).toHaveCount(2)
       await page.getByLabel('Category filter').selectOption('NPC')
@@ -74,11 +88,16 @@ test.describe('NoteBerry Electron QA', () => {
   test('creates each VTT template and validates default category, tags, and starter structure', async ({}, testInfo) => {
     const { app, page, workspacePath } = await launchNoteBerry(testInfo)
     try {
+      await switchToEnglish(page)
       const expectations = [
-        { button: 'NPC', title: 'New NPC', content: '## Role', tag: 'npc' },
+        { button: 'Session', title: 'New Session', content: '# Session Notes', tag: 'session' },
+        { button: 'NPC', title: 'New NPC', content: '## At a Glance', tag: 'npc' },
         { button: 'Location', title: 'New Location', content: '## First Impression', tag: 'location' },
         { button: 'Quest', title: 'New Quest', content: '## Hook', tag: 'quest' },
-        { button: 'Session', title: 'New Session', content: '# Session Notes', tag: 'session' },
+        { button: 'Item', title: 'New Item', content: '## Appearance', tag: 'item' },
+        { button: 'Lore', title: 'New Lore', content: '## Truth', tag: 'lore' },
+        { button: 'Rules', title: 'New Rules', content: '## Situation', tag: 'rules' },
+        { button: 'Handout', title: 'New Handout', content: '## Player-Facing Text', tag: 'handout' },
       ]
       for (const item of expectations) {
         await page.locator('.template-row').getByRole('button', { name: item.button }).click()
@@ -90,7 +109,7 @@ test.describe('NoteBerry Electron QA', () => {
         await assertNoUnexpectedOverlaps(page)
       }
       await expect(page).toHaveScreenshot('noteberry-template-stack-desktop.png', { fullPage: true })
-      await expect.poll(() => readSavedWorkspace(workspacePath).notes.length).toBe(6)
+      await expect.poll(() => readSavedWorkspace(workspacePath).notes.length).toBe(10)
     } finally {
       await app.close()
     }
@@ -99,6 +118,7 @@ test.describe('NoteBerry Electron QA', () => {
   test('creates template notes, edits metadata and markdown, then persists changes', async ({}, testInfo) => {
     const { app, page, workspacePath } = await launchNoteBerry(testInfo)
     try {
+      await switchToEnglish(page)
       await page.locator('.template-row').getByRole('button', { name: 'NPC' }).click()
       await page.getByLabel('Title').fill('Captain Morn')
       await page.getByLabel('Tags').fill('npc, harbor, ally')
@@ -134,6 +154,7 @@ test.describe('NoteBerry Electron QA', () => {
 
   test('flushes pending note edits when the window closes immediately', async ({}, testInfo) => {
     const { app, page, workspacePath } = await launchNoteBerry(testInfo)
+    await switchToEnglish(page)
     await page.getByLabel('Note content').fill('Quick close field report with [[Hidden Pier]].')
     await app.close()
     expect(readSavedWorkspace(workspacePath).notes[0].content).toContain('Quick close field report')
@@ -142,6 +163,7 @@ test.describe('NoteBerry Electron QA', () => {
   test('updates pinning, status, visibility states, and note ordering', async ({}, testInfo) => {
     const { app, page, workspacePath } = await launchNoteBerry(testInfo)
     try {
+      await switchToEnglish(page)
       await page.locator('.note-card', { hasText: 'Archivist Nara' }).click()
       await page.getByLabel('Status').selectOption('resolved')
       await page.locator('.meta-strip select').nth(1).selectOption('table')
@@ -152,7 +174,7 @@ test.describe('NoteBerry Electron QA', () => {
       await page.locator('.meta-strip select').nth(1).selectOption('secret')
       await expect(page.locator('.note-card').first()).toContainText('SECRET')
       await page.getByLabel('Status').selectOption('archived')
-      await expect(page.locator('.note-card').first()).toContainText('archived')
+      await expect(page.locator('.note-card').first()).toContainText('Archived')
       await expect(page).toHaveScreenshot('noteberry-state-ordering-desktop.png', { fullPage: true })
 
       await expect.poll(() => {
@@ -181,6 +203,7 @@ test.describe('NoteBerry Electron QA', () => {
     } as never
     const { app, page, workspacePath } = await launchNoteBerry(testInfo, { workspace: damaged })
     try {
+      await switchToEnglish(page)
       await expect(page.getByLabel('Title')).toHaveValue('Untitled Note')
       await expect(page.locator('.title-edit select')).toHaveValue('Session')
       await expect(page.locator('.meta-strip select').nth(0)).toHaveValue('draft')
@@ -196,6 +219,7 @@ test.describe('NoteBerry Electron QA', () => {
   test('keeps desktop and narrow layouts bounded and screenshot-stable', async ({}, testInfo) => {
     const { app, page } = await launchNoteBerry(testInfo, { workspace: sampleWorkspace() })
     try {
+      await switchToEnglish(page)
       await assertVisibleLayout(page)
       await assertNoUnexpectedOverlaps(page)
       await expect(page).toHaveScreenshot('noteberry-desktop-layout.png', { fullPage: true })
@@ -215,6 +239,12 @@ test.describe('NoteBerry Electron QA', () => {
     }
   })
 })
+
+async function switchToEnglish(page: import('@playwright/test').Page): Promise<void> {
+  await page.getByRole('button', { name: 'Einstellungen' }).click()
+  await page.getByLabel('Sprache').selectOption('en')
+  await page.getByRole('button', { name: 'Close' }).click()
+}
 
 async function assertVisibleLayout(page: import('@playwright/test').Page): Promise<void> {
   const failures = await page.evaluate(() => {
