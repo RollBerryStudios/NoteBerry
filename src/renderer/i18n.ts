@@ -41,6 +41,9 @@ export type NoteCopy = {
   allTags: string
   allVisibility: string
   templates: string
+  blank: string
+  blankHint: string
+  blankTitle: string
   pinned: string
   noTags: string
   title: string
@@ -98,6 +101,9 @@ export const COPY: Record<Locale, NoteCopy> = {
     allTags: 'All tags',
     allVisibility: 'All visibility',
     templates: 'Templates',
+    blank: 'Blank note',
+    blankHint: 'Empty page',
+    blankTitle: 'Blank note',
     pinned: 'Pinned: ',
     noTags: 'no tags',
     title: 'Title',
@@ -153,6 +159,9 @@ export const COPY: Record<Locale, NoteCopy> = {
     allTags: 'Alle Tags',
     allVisibility: 'Alle Sichtbarkeiten',
     templates: 'Vorlagen',
+    blank: 'Leere Notiz',
+    blankHint: 'Ohne Vorlage',
+    blankTitle: 'Leere Notiz',
     pinned: 'Angepinnt: ',
     noTags: 'keine Tags',
     title: 'Titel',
@@ -245,21 +254,24 @@ const TEMPLATE_CONTENT: Record<Locale, Partial<Record<NoteCategory, string>>> = 
   en: {
     Session: `# Session Notes
 
-## Before Play
+## Prep Snapshot
 - Date:
 - Party level:
 - Recap:
-- Opening scene:
-- Key scenes:
+- Character spotlight:
+- Strong start:
+
+## Run List
+- Scenes:
 - Secrets and clues:
-- NPCs:
-- Locations:
-- Treasure:
-- TODO:
+- Fantastic locations:
+- Important NPCs:
+- Monsters / encounters:
+- Rewards:
 
 ## During Play
 - Decisions:
-- Damage, conditions, resources:
+- Clues revealed:
 - Improvised names:
 - New questions:
 
@@ -277,6 +289,7 @@ const TEMPLATE_CONTENT: Record<Locale, Partial<Record<NoteCategory, string>>> = 
 - Appearance:
 - Avatar image:
 - Voice or mannerism:
+- First line:
 
 ## Motivation
 - Wants:
@@ -300,19 +313,24 @@ const TEMPLATE_CONTENT: Record<Locale, Partial<Record<NoteCategory, string>>> = 
 - Mood:
 - Map or image:
 
-## Gameplay
+## Fantastic Aspects
+- Aspect 1:
+- Aspect 2:
+- Aspect 3:
+
+## At the Table
 - Points of interest:
 - NPCs:
 - Encounters:
-- Treasure:
 - Secrets and clues:
 - Hazards:
+- Treasure:
 - Exits:
 `,
     Quest: `# Quest
 
 ## Hook
-- Who offers it:
+- Patron / source:
 - Why now:
 - What the party sees first:
 
@@ -322,11 +340,11 @@ const TEMPLATE_CONTENT: Record<Locale, Partial<Record<NoteCategory, string>>> = 
 - Deadline:
 - Failure consequence:
 
-## Path
+## Clue Path
 - Clue 1:
 - Clue 2:
-- Complication:
-- Optional twist:
+- Clue 3:
+- Complication or twist:
 
 ## Reward
 - Gold / item:
@@ -396,21 +414,24 @@ const TEMPLATE_CONTENT: Record<Locale, Partial<Record<NoteCategory, string>>> = 
   de: {
     Session: `# Sitzungsnotizen
 
-## Vor dem Spiel
+## Prep-Snapshot
 - Datum:
 - Gruppenstufe:
 - Rückblick:
-- Einstiegsszene:
-- Schlüsselszenen:
+- Charakterfokus:
+- Starker Einstieg:
+
+## Laufzettel
+- Szenen:
 - Geheimnisse und Hinweise:
-- NSCs:
-- Orte:
-- Schätze:
-- TODO:
+- Fantastische Orte:
+- Wichtige NSCs:
+- Monster / Begegnungen:
+- Belohnungen:
 
 ## Während des Spiels
 - Entscheidungen:
-- Schaden, Zustände, Ressourcen:
+- Enthüllte Hinweise:
 - Improvisierte Namen:
 - Neue Fragen:
 
@@ -428,6 +449,7 @@ const TEMPLATE_CONTENT: Record<Locale, Partial<Record<NoteCategory, string>>> = 
 - Erscheinung:
 - Avatar-Bild:
 - Stimme oder Eigenart:
+- Erster Satz:
 
 ## Motivation
 - Will:
@@ -451,19 +473,24 @@ const TEMPLATE_CONTENT: Record<Locale, Partial<Record<NoteCategory, string>>> = 
 - Stimmung:
 - Karte oder Bild:
 
-## Spielwert
+## Fantastische Aspekte
+- Aspekt 1:
+- Aspekt 2:
+- Aspekt 3:
+
+## Am Tisch
 - Interessante Punkte:
 - NSCs:
 - Begegnungen:
-- Schätze:
 - Geheimnisse und Hinweise:
 - Gefahren:
+- Schätze:
 - Ausgänge:
 `,
     Quest: `# Quest
 
 ## Aufhänger
-- Wer bietet sie an:
+- Auftraggeber / Quelle:
 - Warum jetzt:
 - Was die Gruppe zuerst sieht:
 
@@ -473,11 +500,11 @@ const TEMPLATE_CONTENT: Record<Locale, Partial<Record<NoteCategory, string>>> = 
 - Frist:
 - Folge bei Scheitern:
 
-## Verlauf
+## Hinweis-Pfad
 - Hinweis 1:
 - Hinweis 2:
-- Komplikation:
-- Optionale Wendung:
+- Hinweis 3:
+- Komplikation oder Wendung:
 
 ## Belohnung
 - Gold / Gegenstand:

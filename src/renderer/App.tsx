@@ -18,13 +18,13 @@ function now(): string {
   return new Date().toISOString()
 }
 
-function newNote(category = 'Session', locale: Locale = 'en'): VttNote {
+function newNote(category = 'Session', locale: Locale = 'en', blank = false): VttNote {
   return {
     id: newId(),
-    title: COPY[locale].newTitle(category),
+    title: blank ? COPY[locale].blankTitle : COPY[locale].newTitle(category),
     category,
-    content: templateContent(locale, category),
-    tags: [category.toLowerCase()],
+    content: blank ? '' : templateContent(locale, category),
+    tags: blank ? [] : [category.toLowerCase()],
     status: 'draft',
     visibility: 'gm',
     pinned: false,
@@ -196,8 +196,8 @@ export default function App() {
     }))
   }
 
-  function createNote(nextCategory = 'Session'): void {
-    const note = newNote(nextCategory, locale)
+  function createNote(nextCategory = 'Session', blank = false): void {
+    const note = newNote(nextCategory, locale, blank)
     setWorkspace((current) => ({ ...current, activeNoteId: note.id, notes: [note, ...current.notes] }))
   }
 
@@ -274,6 +274,10 @@ export default function App() {
           <div className="template-block">
             <h3>{c.templates}</h3>
             <div className="template-row">
+              <button aria-label={c.blank} onClick={() => createNote(category === '__all__' ? 'Session' : category, true)}>
+                <span><span className="category-emoji" aria-hidden="true">📝</span>{c.blank}</span>
+                <small>{c.blankHint}</small>
+              </button>
               {CATEGORIES.map((item) => (
                 <button key={item} aria-label={categoryLabel(locale, item)} onClick={() => createNote(item)}>
                   <span><span className="category-emoji" aria-hidden="true">{categoryEmoji(item)}</span>{categoryLabel(locale, item)}</span>

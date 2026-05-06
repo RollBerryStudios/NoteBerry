@@ -34,7 +34,8 @@ test.describe('NoteBerry Electron QA', () => {
       await expect(page.getByRole('heading', { name: 'Vorschau' })).toBeVisible()
       await expect(page.getByRole('button', { name: 'Exportieren' })).toBeVisible()
       await expect(page.getByPlaceholder('Notizen, Tags, Geheimnisse suchen')).toBeVisible()
-      await expect(page.locator('.template-row .category-emoji').first()).toHaveText('🗓️')
+      await expect(page.locator('.template-row .category-emoji').first()).toHaveText('📝')
+      await expect(page.locator('.template-row').getByRole('button', { name: 'Sitzung' }).locator('.category-emoji')).toHaveText('🗓️')
       await expect(page.locator('.note-card-emoji').first()).toBeVisible()
       await page.getByRole('button', { name: 'Einstellungen' }).click()
       await expect(page.getByRole('dialog', { name: 'Einstellungen' })).toBeVisible()
@@ -93,6 +94,7 @@ test.describe('NoteBerry Electron QA', () => {
     try {
       await switchToEnglish(page)
       const expectations = [
+        { button: 'Blank note', title: 'Blank note', content: '', tag: '' },
         { button: 'Session', title: 'New Session', content: '# Session Notes', tag: 'session' },
         { button: 'NPC', title: 'New NPC', content: '## At a Glance', tag: 'npc' },
         { button: 'Location', title: 'New Location', content: '## First Impression', tag: 'location' },
@@ -105,15 +107,16 @@ test.describe('NoteBerry Electron QA', () => {
       for (const item of expectations) {
         await page.locator('.template-row').getByRole('button', { name: item.button }).click()
         await expect(page.getByLabel('Title')).toHaveValue(item.title)
-        await expect(page.locator('.title-edit select')).toHaveValue(item.button)
+        if (item.button !== 'Blank note') await expect(page.locator('.title-edit select')).toHaveValue(item.button)
         await expect(page.getByLabel('Tags')).toHaveValue(item.tag)
-        await expect(page.getByLabel('Note content')).toContainText(item.content)
+        if (item.content) await expect(page.getByLabel('Note content')).toContainText(item.content)
+        else await expect(page.getByLabel('Note content')).toHaveValue('')
         await expect(page.locator('.note-card.active .note-card-emoji')).toBeVisible()
         await assertVisibleLayout(page)
         await assertNoUnexpectedOverlaps(page)
       }
       await expect(page).toHaveScreenshot('noteberry-template-stack-desktop.png', { fullPage: true })
-      await expect.poll(() => readSavedWorkspace(workspacePath).notes.length).toBe(10)
+      await expect.poll(() => readSavedWorkspace(workspacePath).notes.length).toBe(11)
     } finally {
       await app.close()
     }
