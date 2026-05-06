@@ -44,6 +44,7 @@ test.describe('NoteBerry Electron QA', () => {
       await expect(page.getByRole('button', { name: 'kontakt@rollberry.de' })).toBeVisible()
       await expect(page.getByRole('button', { name: 'GitHub-Repository' })).toBeVisible()
       await expect(page.getByRole('button', { name: 'RollBerry Studios auf GitHub' })).toBeVisible()
+      await expect(page).toHaveScreenshot('noteberry-settings-dark-de.png', { fullPage: true })
       await page.getByLabel('Design').selectOption('light')
       await page.getByRole('button', { name: 'Schließen' }).click()
       await page.locator('.template-row').getByRole('button', { name: 'NSC' }).click()
@@ -241,6 +242,12 @@ test.describe('NoteBerry Electron QA', () => {
       await assertVisibleLayout(page)
       await assertNoUnexpectedOverlaps(page)
       await expect(page).toHaveScreenshot('noteberry-responsive-editor-detail.png', { fullPage: true })
+
+      await page.setViewportSize({ width: 390, height: 844 })
+      await page.waitForTimeout(100)
+      await assertVisibleLayout(page)
+      await assertNoUnexpectedOverlaps(page)
+      await expect(page).toHaveScreenshot('noteberry-mobile-390.png', { fullPage: true })
     } finally {
       await app.close()
     }
