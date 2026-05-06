@@ -152,10 +152,22 @@ h1, h2, h3, p { margin-top: 0; }
   text-align: left;
 }
 .template-row button span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
   font-weight: 750;
+}
+.category-emoji {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 20px;
+  text-align: center;
+  font-size: 16px;
+  line-height: 1;
 }
 .template-row button small {
   overflow: hidden;
@@ -170,18 +182,29 @@ h1, h2, h3, p { margin-top: 0; }
   min-height: 58px;
   text-align: left;
   display: grid;
-  grid-template-columns: 48px minmax(0, 1fr);
+  grid-template-columns: 34px minmax(0, 1fr) 48px;
   gap: 5px 9px;
   align-items: center;
   background: #ffffff;
 }
 .note-card.active { border-color: var(--accent); box-shadow: inset 3px 0 0 var(--accent); }
-.note-card strong { align-self: end; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; line-height: 1.2; }
-.note-card em { grid-column: 2; align-self: start; color: var(--muted); font-size: 11px; font-style: normal; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; line-height: 1.2; }
-.visibility {
+.note-card-emoji {
   grid-row: 1 / 3;
+  width: 28px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  background: #f4f7f2;
+  font-size: 18px;
+}
+.note-card strong { grid-column: 2; align-self: end; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; line-height: 1.2; }
+.note-card em { grid-column: 2 / 4; align-self: start; color: var(--muted); font-size: 11px; font-style: normal; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; line-height: 1.2; }
+.visibility {
+  grid-column: 3;
+  grid-row: 1;
   width: 42px;
-  height: 32px;
+  height: 24px;
   align-self: center;
   display: grid;
   place-items: center;
@@ -336,6 +359,7 @@ h1, h2, h3, p { margin-top: 0; }
 .app-shell[data-theme="dark"] .visibility { background: rgba(128, 183, 199, .17); color: #bfefff; }
 .app-shell[data-theme="dark"] .visibility.table { background: rgba(126, 192, 139, .18); color: #dcffd9; }
 .app-shell[data-theme="dark"] .visibility.secret { background: rgba(239, 139, 120, .16); color: #ffc3bb; }
+.app-shell[data-theme="dark"] .note-card-emoji { background: rgba(255,255,255,.07); }
 .app-shell[data-theme="dark"] .toast { background: #11170f; color: var(--text); }
 .app-shell[data-theme="dark"] .brand strong,
 .app-shell[data-theme="dark"] h1,

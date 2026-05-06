@@ -34,6 +34,8 @@ test.describe('NoteBerry Electron QA', () => {
       await expect(page.getByRole('heading', { name: 'Vorschau' })).toBeVisible()
       await expect(page.getByRole('button', { name: 'Exportieren' })).toBeVisible()
       await expect(page.getByPlaceholder('Notizen, Tags, Geheimnisse suchen')).toBeVisible()
+      await expect(page.locator('.template-row .category-emoji').first()).toHaveText('🗓️')
+      await expect(page.locator('.note-card-emoji').first()).toBeVisible()
       await page.getByRole('button', { name: 'Einstellungen' }).click()
       await expect(page.getByRole('dialog', { name: 'Einstellungen' })).toBeVisible()
       await expect(page.getByLabel('Sprache')).toHaveValue('de')
@@ -106,6 +108,7 @@ test.describe('NoteBerry Electron QA', () => {
         await expect(page.locator('.title-edit select')).toHaveValue(item.button)
         await expect(page.getByLabel('Tags')).toHaveValue(item.tag)
         await expect(page.getByLabel('Note content')).toContainText(item.content)
+        await expect(page.locator('.note-card.active .note-card-emoji')).toBeVisible()
         await assertVisibleLayout(page)
         await assertNoUnexpectedOverlaps(page)
       }

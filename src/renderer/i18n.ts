@@ -5,6 +5,17 @@ export type NoteCategory = 'Session' | 'NPC' | 'Location' | 'Quest' | 'Item' | '
 
 export const CATEGORIES: NoteCategory[] = ['Session', 'NPC', 'Location', 'Quest', 'Item', 'Lore', 'Rules', 'Handout']
 
+const CATEGORY_EMOJIS: Record<NoteCategory, string> = {
+  Session: '🗓️',
+  NPC: '🧑',
+  Location: '🗺️',
+  Quest: '⚔️',
+  Item: '🎒',
+  Lore: '📜',
+  Rules: '🎲',
+  Handout: '📣',
+}
+
 export type NoteCopy = {
   language: string
   settings: string
@@ -537,6 +548,10 @@ const TEMPLATE_CONTENT: Record<Locale, Partial<Record<NoteCategory, string>>> = 
 
 export function categoryLabel(locale: Locale, category: string): string {
   return CATEGORY_LABELS[locale][category] ?? category
+}
+
+export function categoryEmoji(category: string): string {
+  return CATEGORY_EMOJIS[category as NoteCategory] ?? '📝'
 }
 
 export function categoryHint(locale: Locale, category: string): string {

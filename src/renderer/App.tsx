@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { NoteStatus, NoteVisibility, NoteWorkspace, VttNote } from '../preload/preload'
-import { CATEGORIES, COPY, categoryHint, categoryLabel, statusLabel, templateContent, type Locale, visibilityLabel } from './i18n'
+import { CATEGORIES, COPY, categoryEmoji, categoryHint, categoryLabel, statusLabel, templateContent, type Locale, visibilityLabel } from './i18n'
 import logoUrl from '../../resources/logo.png'
 
 type Theme = 'dark' | 'light'
@@ -276,7 +276,7 @@ export default function App() {
             <div className="template-row">
               {CATEGORIES.map((item) => (
                 <button key={item} aria-label={categoryLabel(locale, item)} onClick={() => createNote(item)}>
-                  <span>{categoryLabel(locale, item)}</span>
+                  <span><span className="category-emoji" aria-hidden="true">{categoryEmoji(item)}</span>{categoryLabel(locale, item)}</span>
                   <small>{categoryHint(locale, item)}</small>
                 </button>
               ))}
@@ -289,6 +289,7 @@ export default function App() {
                 className={`note-card ${note.id === activeNote.id ? 'active' : ''}`}
                 onClick={() => setWorkspace((current) => ({ ...current, activeNoteId: note.id }))}
               >
+                <span className="note-card-emoji" aria-hidden="true">{categoryEmoji(note.category)}</span>
                 <span className={`visibility ${note.visibility}`}>{visibilityLabel(locale, note.visibility).toUpperCase()}</span>
                 <strong>{note.pinned ? c.pinned : ''}{note.title}</strong>
                 <em>{categoryLabel(locale, note.category)} / {statusLabel(locale, note.status)} / {note.tags.join(', ') || c.noTags}</em>
