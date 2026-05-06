@@ -7,6 +7,8 @@ type Theme = 'dark' | 'light'
 
 const GITHUB_URL = 'https://github.com/RollBerryStudios/NoteBerry'
 const ROLLBERRY_URL = 'https://github.com/RollBerryStudios'
+const CONTACT_EMAIL = 'kontakt@rollberry.de'
+const CONTACT_URL = `mailto:${CONTACT_EMAIL}`
 
 function newId(): string {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`
@@ -381,6 +383,7 @@ export default function App() {
               <section>
                 <h3>{c.community}</h3>
                 <p>{c.rollberryInfo}</p>
+                <button onClick={() => window.noteberry.openExternal(CONTACT_URL)}>{CONTACT_EMAIL}</button>
                 <button onClick={() => window.noteberry.openExternal(GITHUB_URL)}>{c.githubRepo}</button>
                 <button onClick={() => window.noteberry.openExternal(ROLLBERRY_URL)}>{c.rollberryGithub}</button>
               </section>

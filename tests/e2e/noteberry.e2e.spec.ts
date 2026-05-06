@@ -38,6 +38,7 @@ test.describe('NoteBerry Electron QA', () => {
       await expect(page.getByRole('dialog', { name: 'Einstellungen' })).toBeVisible()
       await expect(page.getByLabel('Sprache')).toHaveValue('de')
       await expect(page.getByLabel('Design')).toHaveValue('dark')
+      await expect(page.getByRole('button', { name: 'kontakt@rollberry.de' })).toBeVisible()
       await expect(page.getByRole('button', { name: 'GitHub-Repository' })).toBeVisible()
       await expect(page.getByRole('button', { name: 'RollBerry Studios auf GitHub' })).toBeVisible()
       await page.getByLabel('Design').selectOption('light')
