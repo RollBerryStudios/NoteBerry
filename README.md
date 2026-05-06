@@ -5,109 +5,266 @@
 <h1 align="center">NoteBerry</h1>
 
 <p align="center">
-  <strong>Rich local note taking designed for virtual tabletop preparation and play.</strong>
+  <strong>Lokale Kampagnen-Notizen fuer Pen-&amp;-Paper-Runden</strong><br>
+  <em>Local-first campaign notes for tabletop RPG sessions</em>
 </p>
 
 <p align="center">
   <img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-yellow.svg">
   <img alt="Version" src="https://img.shields.io/badge/version-0.1.1-blue.svg">
   <img alt="Electron" src="https://img.shields.io/badge/Electron-41-47848F?logo=electron&logoColor=white">
+  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white">
+  <img alt="React" src="https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white">
   <img alt="Local First" src="https://img.shields.io/badge/local--first-offline-brightgreen.svg">
 </p>
 
-NoteBerry is a free, local-first Electron app for campaign notes, session prep,
-NPC records, locations, quests, lore, rules, handouts, and table secrets. It is
-built for tabletop workflows: fast search, structured templates, tags,
-visibility states, markdown preview, TODO tracking, wiki links, and backlinks.
+<p align="center">
+  <a href="#deutsch">Deutsch</a> &nbsp;|&nbsp; <a href="#english">English</a>
+</p>
 
-It is intentionally standalone: use it beside an analog table, another VTT, or
-any campaign workflow where you want focused notes without a full tabletop
-suite.
+---
 
-## Features
+## Deutsch
 
-| Area | Included |
-| --- | --- |
-| Note Workspace | Create, edit, select, search, filter, pin, and delete local notes |
-| VTT Categories | Session, NPC, Location, Quest, Item, Lore, Rules, and Handout |
-| Templates | One-click NPC, Location, Quest, and Session note starters |
-| Tags | Comma-based tag editing and tag filters |
-| Visibility | GM, Table, and Secret note states with a dedicated visibility filter |
-| Markdown Preview | Headings, bullets, emphasis, code, and wiki link highlighting |
-| Table Intel | TODO counter, wiki links, tag chips, and backlinks |
-| Multilingual UI | English and German interface |
-| Persistence | Autosaved local JSON workspace with import/export |
-| Responsive UI | Desktop and narrow viewport layouts covered by Playwright screenshots |
+NoteBerry ist eine **kostenlose, lokale Desktop-App fuer Kampagnen-Notizen,
+Vorbereitung und Spielleitung**. Sie ist fuer Gruppen gedacht, die ihre Notizen
+neben einer analogen Karte, einem anderen VTT oder einem leichten Online-Setup
+organisieren wollen.
 
-## Development
+- **Standalone-Notizworkspace** - keine Kampagne oder Cloud-Anmeldung noetig
+- **VTT-Kategorien** - Sessions, NPCs, Orte, Quests, Gegenstaende, Lore, Regeln und Handouts
+- **Sichtbarkeit** - GM-, Tisch- und Geheim-Notizen mit eigenem Filter
+- **Markdown-Vorschau** - schnelle Struktur fuer Vorbereitung und Spieltisch
+- **Wiki-Links & Backlinks** - Verknuepfungen ueber `[[Name]]`
+- **Mehrsprachig** - Benutzeroberflaeche auf Deutsch und Englisch
+
+Gebaut mit Electron, React, TypeScript und Vite. Laeuft auf macOS, Windows und
+Linux.
+
+### Aktueller Release
+
+Aktuelle Version: **0.1.1**
+
+- [Neueste Release herunterladen](https://github.com/RollBerryStudios/NoteBerry/releases/latest)
+- [Alle Releases anzeigen](https://github.com/RollBerryStudios/NoteBerry/releases)
+- Direkter Tag: [v0.1.1](https://github.com/RollBerryStudios/NoteBerry/releases/tag/v0.1.1)
+
+| Plattform | Artefakt in der Release |
+|---|---|
+| Windows x64 | `NoteBerry.Setup.0.1.1.exe` |
+| Linux x64 | `NoteBerry-0.1.1.AppImage`, `noteberry_0.1.1_amd64.deb` |
+| macOS x64 | `NoteBerry-0.1.1.dmg`, `NoteBerry-0.1.1-mac.zip` |
+| macOS Apple Silicon | `NoteBerry-0.1.1-arm64.dmg`, `NoteBerry-0.1.1-arm64-mac.zip` |
+
+### Features
+
+| Kategorie | Funktion |
+|---|---|
+| **Notizworkspace** | Notizen erstellen, bearbeiten, suchen, filtern, pinnen und loeschen |
+| **VTT-Kategorien** | Session, NPC, Location, Quest, Item, Lore, Rules und Handout |
+| **Templates** | Starter fuer NPC-, Location-, Quest- und Session-Notizen |
+| **Tags** | Komma-basierte Tags und Tag-Filter |
+| **Sichtbarkeit** | GM, Table und Secret mit eigenem Sichtbarkeitsfilter |
+| **Markdown-Vorschau** | Ueberschriften, Listen, Betonung, Code und Wiki-Link-Markierung |
+| **Table Intel** | TODO-Zaehler, Wiki-Links, Tag-Chips und Backlinks |
+| **Autosave** | Lokaler JSON-Workspace mit Import/Export und Daten-Normalisierung |
+| **Responsive UI** | Desktop- und schmale Layouts per Playwright-Screenshots abgesichert |
+
+### Schnellstart
+
+**Voraussetzungen:** Node.js 20+ und npm 10+
 
 ```bash
+git clone https://github.com/RollBerryStudios/NoteBerry.git
+cd NoteBerry
 npm install
 npm run dev
 ```
 
-## Build
+### Builds erstellen
 
 ```bash
-npm run build
-npm run pack
-npm run dist
+npm run build      # TypeScript + Preload + Renderer kompilieren
+npm run pack       # Entpacktes App-Verzeichnis fuer die aktuelle Plattform
+npm run dist       # Installer/Distributionspakete fuer die aktuelle Plattform
 ```
 
-The GitHub release workflow builds Windows `.exe`, Linux `.AppImage`/`.deb`,
-and macOS `.dmg`/`.zip` artifacts.
-
-## Test
+### Qualitaetssicherung
 
 ```bash
-npm run test:e2e
+npm run test:e2e          # Build + Playwright/Electron E2E-Suite
+npm run test:e2e:headed   # Gleiche Suite mit sichtbarem Fenster
+npm run test:e2e:update   # Screenshot-Baselines nach absichtlichen UI-Aenderungen aktualisieren
 ```
 
-The E2E suite launches Electron with isolated test data and validates:
+Die E2E-Suite startet NoteBerry mit isolierten Testdaten und prueft Rendering,
+Suche, Kategorie-/Tag-/Sichtbarkeitsfilter, Templates, Markdown-Vorschau,
+Table Intel, Persistenz, Normalisierung beschaedigter Daten sowie Desktop- und
+Responsive-Screenshots ohne Ueberlappungen.
 
-- first render and core UI
-- search, category filters, tag filters, and visibility filters
-- template note creation
-- markdown preview and table intel
-- edit persistence
-- damaged data normalization
-- desktop and responsive screenshot stability
-- basic overlap and clipping checks
+### Lokale Daten
 
-See [`docs/TESTING.md`](docs/TESTING.md) for the current QA process and next
-coverage targets.
-
-## Data
-
-NoteBerry stores data inside the operating system's Electron app data folder:
+NoteBerry speichert lokal im Electron-AppData-Verzeichnis:
 
 ```text
 data/noteberry-workspace.json
 ```
 
-The workspace is normalized on load so malformed or outdated local data cannot
-break the UI.
+Der Workspace wird beim Laden normalisiert, damit beschaedigte oder veraltete
+Daten die Oberflaeche nicht brechen.
 
-## Project Structure
+### Projektstruktur
 
 ```text
-src/main/       Electron main process and local persistence
-src/preload/    Safe renderer API bridge
-src/renderer/   React note workspace UI
-tests/e2e/      Playwright Electron QA suite
-resources/      Logo and app icons
+src/
+  main/          Electron Main-Prozess, IPC und lokale Persistenz
+  preload/       Sichere Context Bridge fuer die Renderer-API
+  renderer/      React-App, Notizworkspace, Markdown, i18n
+tests/e2e/       Playwright Electron QA-Suite
+resources/       Logo und App-Icons
 ```
 
-## Tech Stack
+### Tech-Stack
 
-| Layer | Technology |
-| --- | --- |
-| Desktop | Electron |
-| Renderer | React + TypeScript |
-| Bundler | Vite |
-| Tests | Playwright |
-| Packaging | electron-builder |
+| Technologie | Verwendung |
+|---|---|
+| Electron 41 | Desktop-Shell und native Dialoge |
+| React 18 | Benutzeroberflaeche |
+| TypeScript 5.9 | Typisierte App-Logik |
+| Vite 6 | Renderer-Bundling |
+| Playwright | Electron E2E und Screenshot-Validierung |
+| electron-builder | Packaging fuer macOS, Windows und Linux |
 
-## License
+### CI/CD & Releases
 
-MIT
+Fertige Builds werden als [GitHub Releases](https://github.com/RollBerryStudios/NoteBerry/releases)
+veroeffentlicht. Die Release-Seite enthaelt Windows-, Linux- und macOS-Artefakte.
+Lokale Builds sind unsigned; notarized macOS-Releases oder signierte
+Windows-Installer brauchen eigene Zertifikate und Secrets.
+
+### Lizenz
+
+App-Code: [MIT](LICENSE) (c) 2026 RollBerry Studios.
+
+---
+
+## English
+
+NoteBerry is a **free, local-first desktop app for campaign notes, prep, and
+table management**. It is built for groups that want focused notes beside an
+analog map, another VTT, or a lightweight online setup.
+
+- **Standalone note workspace** - no campaign suite or cloud account required
+- **VTT categories** - sessions, NPCs, locations, quests, items, lore, rules, and handouts
+- **Visibility** - GM, table, and secret notes with a dedicated filter
+- **Markdown preview** - quick structure for prep and live play
+- **Wiki links & backlinks** - connect notes with `[[Name]]`
+- **Multilingual** - English and German interface
+
+Built with Electron, React, TypeScript, and Vite. Runs on macOS, Windows, and
+Linux.
+
+### Current Release
+
+Current version: **0.1.1**
+
+- [Download the latest release](https://github.com/RollBerryStudios/NoteBerry/releases/latest)
+- [View all releases](https://github.com/RollBerryStudios/NoteBerry/releases)
+- Direct tag: [v0.1.1](https://github.com/RollBerryStudios/NoteBerry/releases/tag/v0.1.1)
+
+| Platform | Release artifact |
+|---|---|
+| Windows x64 | `NoteBerry.Setup.0.1.1.exe` |
+| Linux x64 | `NoteBerry-0.1.1.AppImage`, `noteberry_0.1.1_amd64.deb` |
+| macOS x64 | `NoteBerry-0.1.1.dmg`, `NoteBerry-0.1.1-mac.zip` |
+| macOS Apple Silicon | `NoteBerry-0.1.1-arm64.dmg`, `NoteBerry-0.1.1-arm64-mac.zip` |
+
+### Features
+
+| Category | What you get |
+|---|---|
+| **Note Workspace** | Create, edit, search, filter, pin, and delete notes |
+| **VTT Categories** | Session, NPC, Location, Quest, Item, Lore, Rules, and Handout |
+| **Templates** | Starters for NPC, Location, Quest, and Session notes |
+| **Tags** | Comma-based tags and tag filters |
+| **Visibility** | GM, Table, and Secret with a dedicated visibility filter |
+| **Markdown Preview** | Headings, lists, emphasis, code, and wiki link highlighting |
+| **Table Intel** | TODO counter, wiki links, tag chips, and backlinks |
+| **Autosave** | Local JSON workspace with import/export and data normalization |
+| **Responsive UI** | Desktop and narrow layouts covered by Playwright screenshots |
+
+### Getting Started
+
+**Prerequisites:** Node.js 20+ and npm 10+
+
+```bash
+git clone https://github.com/RollBerryStudios/NoteBerry.git
+cd NoteBerry
+npm install
+npm run dev
+```
+
+### Building
+
+```bash
+npm run build      # Compile TypeScript, preload, and renderer
+npm run pack       # Build an unpacked app directory for the current platform
+npm run dist       # Build distributable packages for the current platform
+```
+
+### Quality Assurance
+
+```bash
+npm run test:e2e          # Build + Playwright/Electron E2E suite
+npm run test:e2e:headed   # Same suite with a visible window
+npm run test:e2e:update   # Refresh screenshot baselines after intentional UI changes
+```
+
+The E2E suite launches NoteBerry with isolated test data and validates
+rendering, search, category/tag/visibility filters, templates, markdown
+preview, table intel, persistence, damaged data normalization, and
+desktop/responsive screenshots without layout overlaps.
+
+### Local Data
+
+NoteBerry stores its local data in the Electron app data folder:
+
+```text
+data/noteberry-workspace.json
+```
+
+The workspace is normalized on load so damaged or outdated data cannot break
+the UI.
+
+### Project Structure
+
+```text
+src/
+  main/          Electron main process, IPC, and local persistence
+  preload/       Safe context bridge for the renderer API
+  renderer/      React app, note workspace, markdown, i18n
+tests/e2e/       Playwright Electron QA suite
+resources/       Logo and app icons
+```
+
+### Tech Stack
+
+| Technology | Usage |
+|---|---|
+| Electron 41 | Desktop shell and native dialogs |
+| React 18 | User interface |
+| TypeScript 5.9 | Typed app logic |
+| Vite 6 | Renderer bundling |
+| Playwright | Electron E2E and screenshot validation |
+| electron-builder | Packaging for macOS, Windows, and Linux |
+
+### CI/CD & Releases
+
+Ready-to-use builds are published as [GitHub Releases](https://github.com/RollBerryStudios/NoteBerry/releases).
+The release page contains Windows, Linux, and macOS artifacts. Local builds are
+unsigned; notarized macOS releases or signed Windows installers require your
+own certificates and secrets.
+
+### License
+
+App code: [MIT](LICENSE) (c) 2026 RollBerry Studios.
