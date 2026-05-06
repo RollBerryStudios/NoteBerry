@@ -5,7 +5,7 @@
 <h1 align="center">NoteBerry</h1>
 
 <p align="center">
-  <strong>Lokale Kampagnen-Notizen fuer Pen-&amp;-Paper-Runden</strong><br>
+  <strong>Lokale Kampagnen-Notizen für Pen-&amp;-Paper-Runden</strong><br>
   <em>Local-first campaign notes for tabletop RPG sessions</em>
 </p>
 
@@ -26,19 +26,19 @@
 
 ## Deutsch
 
-NoteBerry ist eine **kostenlose, lokale Desktop-App fuer Kampagnen-Notizen,
-Vorbereitung und Spielleitung**. Sie ist fuer Gruppen gedacht, die ihre Notizen
+NoteBerry ist eine **kostenlose, lokale Desktop-App für Kampagnen-Notizen,
+Vorbereitung und Spielleitung**. Sie ist für Gruppen gedacht, die ihre Notizen
 neben einer analogen Karte, einem anderen VTT oder einem leichten Online-Setup
 organisieren wollen.
 
-- **Standalone-Notizworkspace** - keine Kampagne oder Cloud-Anmeldung noetig
-- **VTT-Kategorien** - Sessions, NPCs, Orte, Quests, Gegenstaende, Lore, Regeln und Handouts
+- **Standalone-Notizworkspace** - keine Kampagne oder Cloud-Anmeldung nötig
+- **VTT-Kategorien** - Sessions, NPCs, Orte, Quests, Gegenstände, Lore, Regeln und Handouts
 - **Sichtbarkeit** - GM-, Tisch- und Geheim-Notizen mit eigenem Filter
-- **Markdown-Vorschau** - schnelle Struktur fuer Vorbereitung und Spieltisch
-- **Wiki-Links & Backlinks** - Verknuepfungen ueber `[[Name]]`
-- **Mehrsprachig** - Benutzeroberflaeche auf Deutsch und Englisch
+- **Markdown-Vorschau** - schnelle Struktur für Vorbereitung und Spieltisch
+- **Wiki-Links & Backlinks** - Verknüpfungen über `[[Name]]`
+- **Mehrsprachig** - Benutzeroberfläche auf Deutsch und Englisch
 
-Gebaut mit Electron, React, TypeScript und Vite. Laeuft auf macOS, Windows und
+Gebaut mit Electron, React, TypeScript und Vite. Läuft auf macOS, Windows und
 Linux.
 
 ### Aktueller Release
@@ -60,13 +60,13 @@ Aktuelle Version: **0.1.1**
 
 | Kategorie | Funktion |
 |---|---|
-| **Notizworkspace** | Notizen erstellen, bearbeiten, suchen, filtern, pinnen und loeschen |
+| **Notizworkspace** | Notizen erstellen, bearbeiten, suchen, filtern, pinnen und löschen |
 | **VTT-Kategorien** | Session, NPC, Location, Quest, Item, Lore, Rules und Handout |
-| **Templates** | Starter fuer NPC-, Location-, Quest- und Session-Notizen |
+| **Templates** | Starter für NPC-, Location-, Quest- und Session-Notizen |
 | **Tags** | Komma-basierte Tags und Tag-Filter |
 | **Sichtbarkeit** | GM, Table und Secret mit eigenem Sichtbarkeitsfilter |
-| **Markdown-Vorschau** | Ueberschriften, Listen, Betonung, Code und Wiki-Link-Markierung |
-| **Table Intel** | TODO-Zaehler, Wiki-Links, Tag-Chips und Backlinks |
+| **Markdown-Vorschau** | Überschriften, Listen, Betonung, Code und Wiki-Link-Markierung |
+| **Table Intel** | TODO-Zähler, Wiki-Links, Tag-Chips und Backlinks |
 | **Autosave** | Lokaler JSON-Workspace mit Import/Export und Daten-Normalisierung |
 | **Responsive UI** | Desktop- und schmale Layouts per Playwright-Screenshots abgesichert |
 
@@ -85,22 +85,22 @@ npm run dev
 
 ```bash
 npm run build      # TypeScript + Preload + Renderer kompilieren
-npm run pack       # Entpacktes App-Verzeichnis fuer die aktuelle Plattform
-npm run dist       # Installer/Distributionspakete fuer die aktuelle Plattform
+npm run pack       # Entpacktes App-Verzeichnis für die aktuelle Plattform
+npm run dist       # Installer/Distributionspakete für die aktuelle Plattform
 ```
 
-### Qualitaetssicherung
+### Qualitätssicherung
 
 ```bash
 npm run test:e2e          # Build + Playwright/Electron E2E-Suite
 npm run test:e2e:headed   # Gleiche Suite mit sichtbarem Fenster
-npm run test:e2e:update   # Screenshot-Baselines nach absichtlichen UI-Aenderungen aktualisieren
+npm run test:e2e:update   # Screenshot-Baselines nach absichtlichen UI-Änderungen aktualisieren
 ```
 
-Die E2E-Suite startet NoteBerry mit isolierten Testdaten und prueft Rendering,
+Die E2E-Suite startet NoteBerry mit isolierten Testdaten und prüft Rendering,
 Suche, Kategorie-/Tag-/Sichtbarkeitsfilter, Templates, Markdown-Vorschau,
-Table Intel, Persistenz, Normalisierung beschaedigter Daten sowie Desktop- und
-Responsive-Screenshots ohne Ueberlappungen.
+Table Intel, Persistenz, Normalisierung beschädigter Daten sowie Desktop- und
+Responsive-Screenshots ohne Überlappungen.
 
 ### Lokale Daten
 
@@ -110,15 +110,15 @@ NoteBerry speichert lokal im Electron-AppData-Verzeichnis:
 data/noteberry-workspace.json
 ```
 
-Der Workspace wird beim Laden normalisiert, damit beschaedigte oder veraltete
-Daten die Oberflaeche nicht brechen.
+Der Workspace wird beim Laden normalisiert, damit beschädigte oder veraltete
+Daten die Oberfläche nicht brechen.
 
 ### Projektstruktur
 
 ```text
 src/
   main/          Electron Main-Prozess, IPC und lokale Persistenz
-  preload/       Sichere Context Bridge fuer die Renderer-API
+  preload/       Sichere Context Bridge für die Renderer-API
   renderer/      React-App, Notizworkspace, Markdown, i18n
 tests/e2e/       Playwright Electron QA-Suite
 resources/       Logo und App-Icons
@@ -129,16 +129,16 @@ resources/       Logo und App-Icons
 | Technologie | Verwendung |
 |---|---|
 | Electron 41 | Desktop-Shell und native Dialoge |
-| React 18 | Benutzeroberflaeche |
+| React 18 | Benutzeroberfläche |
 | TypeScript 5.9 | Typisierte App-Logik |
 | Vite 6 | Renderer-Bundling |
 | Playwright | Electron E2E und Screenshot-Validierung |
-| electron-builder | Packaging fuer macOS, Windows und Linux |
+| electron-builder | Packaging für macOS, Windows und Linux |
 
 ### CI/CD & Releases
 
 Fertige Builds werden als [GitHub Releases](https://github.com/RollBerryStudios/NoteBerry/releases)
-veroeffentlicht. Die Release-Seite enthaelt Windows-, Linux- und macOS-Artefakte.
+veröffentlicht. Die Release-Seite enthält Windows-, Linux- und macOS-Artefakte.
 Lokale Builds sind unsigned; notarized macOS-Releases oder signierte
 Windows-Installer brauchen eigene Zertifikate und Secrets.
 
