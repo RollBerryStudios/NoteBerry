@@ -1,21 +1,41 @@
+@import './styles/rollberry-tokens.css';
+
 :root {
+  color-scheme: dark;
+  font-family: var(--rb-font-sans);
+  background: var(--rb-bg);
+  color: var(--rb-text);
+  --bg: var(--rb-bg);
+  --surface: var(--rb-surface);
+  --surface-2: var(--rb-surface-2);
+  --surface-3: var(--rb-surface-3);
+  --line: var(--rb-line);
+  --line-strong: color-mix(in srgb, var(--rb-line) 72%, var(--rb-text) 28%);
+  --muted: var(--rb-text-2);
+  --text: var(--rb-text);
+  --accent: var(--rb-app-accent);
+  --accent-2: var(--rb-app-accent-2);
+  --accent-soft: var(--rb-accent-soft);
+  --secret: var(--rb-danger);
+  --shadow: var(--rb-shadow-popover);
+}
+
+.app-shell[data-theme="light"] {
   color-scheme: light;
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background: #eef1ec;
-  color: #1f261f;
-  --bg: #eef1ec;
-  --surface: #fbfcfa;
-  --surface-2: #f4f6f2;
-  --surface-3: #e7ece4;
-  --line: #d2dbcf;
-  --line-strong: #b9c6b4;
-  --muted: #667165;
-  --text: #1f261f;
-  --accent: #2f7d5b;
-  --accent-2: #486fa8;
-  --accent-soft: #e3f0e8;
-  --secret: #b85d4b;
-  --shadow: 0 16px 36px rgba(31, 38, 31, .08);
+  color: var(--text);
+  --bg: var(--rb-bg);
+  --surface: var(--rb-surface);
+  --surface-2: var(--rb-surface-2);
+  --surface-3: var(--rb-surface-3);
+  --line: var(--rb-line);
+  --line-strong: color-mix(in srgb, var(--rb-line) 72%, var(--rb-text) 28%);
+  --muted: var(--rb-text-2);
+  --text: var(--rb-text);
+  --accent: var(--rb-app-accent);
+  --accent-2: var(--rb-app-accent-2);
+  --accent-soft: var(--rb-accent-soft);
+  --secret: var(--rb-danger);
+  --shadow: var(--rb-shadow-popover);
 }
 
 * { box-sizing: border-box; }
@@ -298,19 +318,19 @@ h1, h2, h3, p { margin-top: 0; }
 .app-shell[data-theme="dark"] {
   color-scheme: dark;
   color: var(--text);
-  --bg: #10130f;
-  --surface: #171d16;
-  --surface-2: #1e271d;
-  --surface-3: #2a3528;
-  --line: #42523d;
-  --line-strong: #5c6e54;
-  --muted: #bac3b2;
-  --text: #f6f1df;
-  --accent: #7ec08b;
-  --accent-2: #80b7c7;
-  --accent-soft: rgba(126, 192, 139, .18);
-  --secret: #ef8b78;
-  --shadow: 0 18px 42px rgba(0, 0, 0, .32);
+  --bg: var(--rb-bg);
+  --surface: var(--rb-surface);
+  --surface-2: var(--rb-surface-2);
+  --surface-3: var(--rb-surface-3);
+  --line: var(--rb-line);
+  --line-strong: color-mix(in srgb, var(--rb-line) 72%, var(--rb-text) 28%);
+  --muted: var(--rb-text-2);
+  --text: var(--rb-text);
+  --accent: var(--rb-app-accent);
+  --accent-2: var(--rb-app-accent-2);
+  --accent-soft: var(--rb-accent-soft);
+  --secret: var(--rb-danger);
+  --shadow: var(--rb-shadow-popover);
   background:
     linear-gradient(180deg, rgba(40, 51, 37, .82), rgba(16, 19, 15, .98) 190px),
     var(--bg);
