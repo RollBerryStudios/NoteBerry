@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import type { NoteStatus, NoteVisibility, NoteWorkspace, VttNote } from '../preload/preload'
-import { CATEGORIES, COPY, categoryEmoji, categoryHint, categoryLabel, statusLabel, templateContent, type Locale, visibilityLabel } from './i18n'
+import type { NoteStatus, NoteWorkspace, VttNote } from '../preload/preload'
+import { CATEGORIES, COPY, categoryEmoji, categoryHint, categoryLabel, statusLabel, templateContent, type Locale, type NoteCategory } from './i18n'
 import logoUrl from '../../resources/logo.png'
 
 type Theme = 'dark' | 'light'
@@ -34,7 +34,7 @@ function newNote(category = 'Session', locale: Locale = 'en', blank = false): Vt
 }
 
 function emptyWorkspace(): NoteWorkspace {
-  const note = newNote()
+  const note = newNote('Session', 'de', true)
   return { version: 1, activeNoteId: note.id, notes: [note] }
 }
 
@@ -46,34 +46,17 @@ function wikiLinks(content: string): string[] {
   return Array.from(content.matchAll(/\[\[([^\]]+)\]\]/g)).map((match) => match[1].trim()).filter(Boolean)
 }
 
-function todoCount(content: string): number {
-  return content.split('\n').filter((line) => /\bTODO\b|^- \[ \]/i.test(line.trim())).length
-}
-
-function formatInline(line: string): string {
-  return line
-    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*([^*]+)\*/g, '<em>$1</em>')
-    .replace(/`([^`]+)`/g, '<code>$1</code>')
-    .replace(/\[\[([^\]]+)\]\]/g, '<mark>$1</mark>')
-}
-
-function renderMarkdown(content: string): string {
-  const escaped = content
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-  return escaped
-    .split('\n')
-    .map((line) => {
-      if (line.startsWith('# ')) return `<h1>${line.slice(2)}</h1>`
-      if (line.startsWith('## ')) return `<h2>${line.slice(3)}</h2>`
-      if (line.startsWith('### ')) return `<h3>${line.slice(4)}</h3>`
-      if (line.startsWith('- ')) return `<p class="bullet">${formatInline(line.slice(2))}</p>`
-      if (!line.trim()) return '<br />'
-      return `<p>${formatInline(line)}</p>`
-    })
-    .join('')
+function noteSections(content: string): Array<{ title: string; lines: string[] }> {
+  const sections: Array<{ title: string; lines: string[] }> = []
+  for (const line of content.split('\n')) {
+    if (line.startsWith('## ')) {
+      sections.push({ title: line.slice(3).trim(), lines: [] })
+      continue
+    }
+    if (!sections.length && line.trim() && !line.startsWith('# ')) sections.push({ title: 'Notiz', lines: [] })
+    if (sections.length && line.trim() && !line.startsWith('# ')) sections[sections.length - 1].lines.push(line.replace(/^- /, ''))
+  }
+  return sections.slice(0, 8)
 }
 
 function buildNoteIndex(notes: VttNote[]) {
@@ -98,11 +81,13 @@ export default function App() {
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('__all__')
   const [tagFilter, setTagFilter] = useState('__all__')
-  const [visibilityFilter, setVisibilityFilter] = useState<'__all__' | NoteVisibility>('__all__')
   const [toast, setToast] = useState<string | null>(null)
   const [locale, setLocaleState] = useState<Locale>(() => localStorage.getItem('noteberry-locale') === 'en' ? 'en' : 'de')
   const [theme, setThemeState] = useState<Theme>(() => localStorage.getItem('noteberry-theme') === 'light' ? 'light' : 'dark')
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [templateOpen, setTemplateOpen] = useState(false)
+  const [draftCategory, setDraftCategory] = useState<NoteCategory>('Session')
+  const [draftBlank, setDraftBlank] = useState(false)
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const workspaceRef = useRef(workspace)
 
@@ -171,17 +156,18 @@ export default function App() {
     if (!activeNote) return []
     return workspace.notes.filter((note) => note.id !== activeNote.id && (noteIndex.linksById.get(note.id) ?? []).includes(activeNote.title))
   }, [activeNote, noteIndex.linksById, workspace.notes])
-  const renderedPreview = useMemo(() => renderMarkdown(activeNote?.content ?? ''), [activeNote?.content])
+  const activeSections = useMemo(() => noteSections(activeNote?.content ?? ''), [activeNote?.content])
+  const draftContent = draftBlank ? '' : templateContent(locale, draftCategory)
+  const draftSections = useMemo(() => noteSections(draftContent), [draftContent])
 
   const filteredNotes = useMemo(() => {
     const q = search.trim().toLowerCase()
     return workspace.notes
       .filter((note) => category === '__all__' || note.category === category)
       .filter((note) => tagFilter === '__all__' || note.tags.includes(tagFilter))
-      .filter((note) => visibilityFilter === '__all__' || note.visibility === visibilityFilter)
       .filter((note) => !q || (noteIndex.searchById.get(note.id) ?? '').includes(q))
       .sort((a, b) => Number(b.pinned) - Number(a.pinned) || b.updatedAt.localeCompare(a.updatedAt))
-  }, [category, noteIndex.searchById, search, tagFilter, visibilityFilter, workspace.notes])
+  }, [category, noteIndex.searchById, search, tagFilter, workspace.notes])
 
   function notify(message: string): void {
     setToast(message)
@@ -199,6 +185,11 @@ export default function App() {
   function createNote(nextCategory = 'Session', blank = false): void {
     const note = newNote(nextCategory, locale, blank)
     setWorkspace((current) => ({ ...current, activeNoteId: note.id, notes: [note, ...current.notes] }))
+  }
+
+  function createSelectedTemplate(): void {
+    createNote(draftCategory, draftBlank)
+    setTemplateOpen(false)
   }
 
   async function deleteNote(): Promise<void> {
@@ -239,9 +230,6 @@ export default function App() {
         </div>
         <div className="titlebar-actions">
           <button className="icon-button settings-trigger" aria-label={c.settings} title={c.settings} onClick={() => setSettingsOpen(true)}>⚙</button>
-          <button onClick={() => window.noteberry.exportWorkspace(workspace)}>{c.export}</button>
-          <button onClick={importWorkspace}>{c.import}</button>
-          <button onClick={() => window.noteberry.revealData()}>{c.dataFolder}</button>
         </div>
       </header>
 
@@ -252,7 +240,11 @@ export default function App() {
               <h2>{c.notes}</h2>
               <p>{workspace.notes.length} {c.entries}</p>
             </div>
-            <button className="primary" onClick={() => createNote(category === '__all__' ? 'Session' : category)}>{c.new}</button>
+            <button className="primary" onClick={() => {
+              setDraftCategory((category === '__all__' ? 'Session' : category) as NoteCategory)
+              setDraftBlank(false)
+              setTemplateOpen(true)
+            }}>{c.new}</button>
           </div>
           <div className="filters">
             <input aria-label={c.searchNotes} value={search} onChange={(event) => setSearch(event.target.value)} placeholder={c.search} />
@@ -264,27 +256,6 @@ export default function App() {
               <option value="__all__">{c.allTags}</option>
               {allTags.map((tag) => <option key={tag} value={tag}>{tag}</option>)}
             </select>
-            <select aria-label={c.visibilityFilter} value={visibilityFilter} onChange={(event) => setVisibilityFilter(event.target.value as '__all__' | NoteVisibility)}>
-              <option value="__all__">{c.allVisibility}</option>
-              <option value="gm">{visibilityLabel(locale, 'gm')}</option>
-              <option value="table">{visibilityLabel(locale, 'table')}</option>
-              <option value="secret">{visibilityLabel(locale, 'secret')}</option>
-            </select>
-          </div>
-          <div className="template-block">
-            <h3>{c.templates}</h3>
-            <div className="template-row">
-              <button aria-label={c.blank} onClick={() => createNote(category === '__all__' ? 'Session' : category, true)}>
-                <span><span className="category-emoji" aria-hidden="true">📝</span>{c.blank}</span>
-                <small>{c.blankHint}</small>
-              </button>
-              {CATEGORIES.map((item) => (
-                <button key={item} aria-label={categoryLabel(locale, item)} onClick={() => createNote(item)}>
-                  <span><span className="category-emoji" aria-hidden="true">{categoryEmoji(item)}</span>{categoryLabel(locale, item)}</span>
-                  <small>{categoryHint(locale, item)}</small>
-                </button>
-              ))}
-            </div>
           </div>
           <div className="note-list">
             {filteredNotes.map((note) => (
@@ -294,7 +265,6 @@ export default function App() {
                 onClick={() => setWorkspace((current) => ({ ...current, activeNoteId: note.id }))}
               >
                 <span className="note-card-emoji" aria-hidden="true">{categoryEmoji(note.category)}</span>
-                <span className={`visibility ${note.visibility}`}>{visibilityLabel(locale, note.visibility).toUpperCase()}</span>
                 <strong>{note.pinned ? c.pinned : ''}{note.title}</strong>
                 <em>{categoryLabel(locale, note.category)} / {statusLabel(locale, note.status)} / {note.tags.join(', ') || c.noTags}</em>
               </button>
@@ -324,13 +294,6 @@ export default function App() {
                 <option value="archived">{statusLabel(locale, 'archived')}</option>
               </select>
             </label>
-            <label>{c.visibility}
-              <select value={activeNote.visibility} onChange={(event) => updateActive({ visibility: event.target.value as NoteVisibility })}>
-                <option value="gm">{visibilityLabel(locale, 'gm')}</option>
-                <option value="table">{visibilityLabel(locale, 'table')}</option>
-                <option value="secret">{visibilityLabel(locale, 'secret')}</option>
-              </select>
-            </label>
             <label>{c.tags}<input aria-label="Tags" value={activeNote.tags.join(', ')} onChange={(event) => updateActive({ tags: parseTags(event.target.value) })} /></label>
             <label className="check-line"><input type="checkbox" checked={activeNote.pinned} onChange={(event) => updateActive({ pinned: event.target.checked })} /> {c.pinnedLabel}</label>
           </div>
@@ -340,14 +303,16 @@ export default function App() {
               <h2>{c.editor}</h2>
               <textarea aria-label={c.noteContent} value={activeNote.content} onChange={(event) => updateActive({ content: event.target.value })} />
             </section>
-            <section className="preview-card">
-              <h2>{c.preview}</h2>
-              <div className="markdown-preview" dangerouslySetInnerHTML={{ __html: renderedPreview }} />
-            </section>
-            <aside className="intel-card">
-              <h2>{c.intel}</h2>
-              <div className="intel-stat"><span>{c.todos}</span><strong>{todoCount(activeNote.content)}</strong></div>
-              <div className="intel-stat"><span>{c.links}</span><strong>{links.length}</strong></div>
+            <aside className="structure-card">
+              <h2>{c.noteStructure}</h2>
+              <div className="template-card-grid">
+                {(activeSections.length ? activeSections : noteSections(templateContent(locale, activeNote.category))).map((section) => (
+                  <article className="template-card" key={section.title}>
+                    <h3>{section.title}</h3>
+                    {section.lines.slice(0, 6).map((line) => <p key={line}>{line}</p>)}
+                  </article>
+                ))}
+              </div>
               <div className="tag-cloud">
                 {activeNote.tags.map((tag) => <button key={tag} onClick={() => setTagFilter(tag)}>{tag}</button>)}
               </div>
@@ -359,6 +324,49 @@ export default function App() {
           </div>
         </section>
       </main>
+      {templateOpen && (
+        <div className="modal-backdrop" onClick={() => setTemplateOpen(false)}>
+          <section className="template-modal" role="dialog" aria-modal="true" aria-label={c.chooseTemplate} onClick={(event) => event.stopPropagation()}>
+            <header>
+              <div>
+                <h2>{c.chooseTemplate}</h2>
+                <p>{c.blankHint}</p>
+              </div>
+              <button aria-label={c.close} onClick={() => setTemplateOpen(false)}>×</button>
+            </header>
+            <div className="template-modal-body">
+              <div className="template-row modal-template-row">
+                <button className={draftBlank ? 'active' : ''} aria-label={c.blank} onClick={() => setDraftBlank(true)}>
+                  <span><span className="category-emoji" aria-hidden="true">📝</span>{c.blank}</span>
+                  <small>{c.blankHint}</small>
+                </button>
+                {CATEGORIES.map((item) => (
+                  <button key={item} className={!draftBlank && draftCategory === item ? 'active' : ''} aria-label={categoryLabel(locale, item)} onClick={() => { setDraftCategory(item); setDraftBlank(false) }}>
+                    <span><span className="category-emoji" aria-hidden="true">{categoryEmoji(item)}</span>{categoryLabel(locale, item)}</span>
+                    <small>{categoryHint(locale, item)}</small>
+                  </button>
+                ))}
+              </div>
+              <section className="template-preview">
+                <h3>{c.templatePreview}</h3>
+                <div className="template-card-grid">
+                  {(draftBlank ? [] : draftSections).map((section) => (
+                    <article className="template-card" key={section.title}>
+                      <h3>{section.title}</h3>
+                      {section.lines.slice(0, 6).map((line) => <p key={line}>{line}</p>)}
+                    </article>
+                  ))}
+                  {draftBlank && <article className="template-card empty-template"><h3>{c.blank}</h3><p>{c.blankHint}</p></article>}
+                </div>
+              </section>
+            </div>
+            <footer>
+              <button onClick={() => setTemplateOpen(false)}>{c.close}</button>
+              <button className="primary" onClick={createSelectedTemplate}>{c.useTemplate}</button>
+            </footer>
+          </section>
+        </div>
+      )}
       {settingsOpen && (
         <div className="modal-backdrop" onClick={() => setSettingsOpen(false)}>
           <section className="settings-modal" role="dialog" aria-modal="true" aria-label={c.settings} onClick={(event) => event.stopPropagation()}>
@@ -390,6 +398,11 @@ export default function App() {
                   ]}
                   onChange={(value) => setTheme(value as Theme)}
                 />
+              </section>
+              <section>
+                <h3>{c.fileActions}</h3>
+                <button onClick={() => window.noteberry.exportWorkspace(workspace)}>{c.export}</button>
+                <button onClick={importWorkspace}>{c.import}</button>
               </section>
               <section>
                 <h3>{c.community}</h3>

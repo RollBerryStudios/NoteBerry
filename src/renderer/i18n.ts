@@ -32,7 +32,12 @@ export type NoteCopy = {
   tagline: string
   export: string
   import: string
-  dataFolder: string
+  fileActions: string
+  createNote: string
+  chooseTemplate: string
+  templatePreview: string
+  useTemplate: string
+  noteStructure: string
   notes: string
   entries: string
   new: string
@@ -92,7 +97,12 @@ export const COPY: Record<Locale, NoteCopy> = {
     tagline: 'Fast D&D notes for prep and play',
     export: 'Export',
     import: 'Import',
-    dataFolder: 'Data Folder',
+    fileActions: 'File',
+    createNote: 'Create note',
+    chooseTemplate: 'Choose a note template',
+    templatePreview: 'Template structure',
+    useTemplate: 'Create',
+    noteStructure: 'Structure',
     notes: 'Notes',
     entries: 'entries',
     new: 'New',
@@ -150,7 +160,12 @@ export const COPY: Record<Locale, NoteCopy> = {
     tagline: 'Schnelle D&D-Notizen für Vorbereitung und Spiel',
     export: 'Exportieren',
     import: 'Importieren',
-    dataFolder: 'Datenordner',
+    fileActions: 'Datei',
+    createNote: 'Notiz erstellen',
+    chooseTemplate: 'Notizvorlage wählen',
+    templatePreview: 'Vorlagenstruktur',
+    useTemplate: 'Erstellen',
+    noteStructure: 'Struktur',
     notes: 'Notizen',
     entries: 'Einträge',
     new: 'Neu',
