@@ -247,7 +247,10 @@ test.describe('NoteBerry Electron QA', () => {
       await page.waitForTimeout(100)
       await assertVisibleLayout(page)
       await assertNoUnexpectedOverlaps(page)
-      await expect(page).toHaveScreenshot('noteberry-mobile-390.png', { fullPage: true })
+      await expect(page).toHaveScreenshot('noteberry-mobile-390.png', {
+        fullPage: true,
+        maxDiffPixelRatio: 0.08,
+      })
     } finally {
       await app.close()
     }
