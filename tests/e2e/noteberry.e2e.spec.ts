@@ -44,6 +44,7 @@ test.describe('NoteBerry Electron QA', () => {
       await expect(page.getByRole('button', { name: 'kontakt@rollberry.de' })).toBeVisible()
       await expect(page.getByRole('button', { name: 'GitHub-Repository' })).toBeVisible()
       await expect(page.getByRole('button', { name: 'RollBerry Studios auf GitHub' })).toBeVisible()
+      await expect(page).toHaveScreenshot('noteberry-settings-dark-de.png', { fullPage: true })
       await page.getByLabel('Design').selectOption('light')
       await page.getByRole('button', { name: 'Schließen' }).click()
       await page.locator('.template-row').getByRole('button', { name: 'NSC' }).click()
@@ -241,6 +242,12 @@ test.describe('NoteBerry Electron QA', () => {
       await assertVisibleLayout(page)
       await assertNoUnexpectedOverlaps(page)
       await expect(page).toHaveScreenshot('noteberry-responsive-editor-detail.png', { fullPage: true })
+
+      await page.setViewportSize({ width: 390, height: 844 })
+      await page.waitForTimeout(100)
+      await assertVisibleLayout(page)
+      await assertNoUnexpectedOverlaps(page)
+      await expect(page).toHaveScreenshot('noteberry-mobile-390.png', { fullPage: true })
     } finally {
       await app.close()
     }
@@ -269,7 +276,37 @@ async function assertVisibleLayout(page: import('@playwright/test').Page): Promi
         if (rect.width <= 0 || rect.height <= 0) result.push(`${selector} has empty bounds`)
         if (rect.left < -1 || rect.right > viewport.width + 1) result.push(`${selector} overflows horizontally`)
         if (element instanceof HTMLButtonElement && element.scrollWidth > element.clientWidth + 2) result.push(`button text clips: ${element.textContent?.trim()}`)
+        if (element.matches('button, input, select, textarea') && !element.closest('.note-list, .mini-list, .markdown-preview, .intel-card')) {
+          const clippedBy = clippedByHiddenAncestor(element, rect)
+          if (clippedBy) result.push(`${selector} is clipped by ${clippedBy}: ${element.textContent?.trim().slice(0, 40)}`)
+        }
       }
+    }
+
+    function clippedByHiddenAncestor(element: Element, elementRect: DOMRect): string | null {
+      let clip = {
+        left: elementRect.left,
+        right: elementRect.right,
+        top: elementRect.top,
+        bottom: elementRect.bottom,
+      }
+      for (let parent = element.parentElement; parent && parent !== document.body; parent = parent.parentElement) {
+        const style = window.getComputedStyle(parent)
+        const clipsX = style.overflowX === 'hidden' || style.overflowX === 'clip'
+        const clipsY = style.overflowY === 'hidden' || style.overflowY === 'clip'
+        if (!clipsX && !clipsY) continue
+        const parentRect = parent.getBoundingClientRect()
+        clip = {
+          left: clipsX ? Math.max(clip.left, parentRect.left) : clip.left,
+          right: clipsX ? Math.min(clip.right, parentRect.right) : clip.right,
+          top: clipsY ? Math.max(clip.top, parentRect.top) : clip.top,
+          bottom: clipsY ? Math.min(clip.bottom, parentRect.bottom) : clip.bottom,
+        }
+        if (clip.right < elementRect.right - 2 || clip.left > elementRect.left + 2 || clip.bottom < elementRect.bottom - 2 || clip.top > elementRect.top + 2) {
+          return parent.className || parent.tagName.toLowerCase()
+        }
+      }
+      return null
     }
     return result
   })

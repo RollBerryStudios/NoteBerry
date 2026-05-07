@@ -238,7 +238,7 @@ export default function App() {
           </div>
         </div>
         <div className="titlebar-actions">
-          <button onClick={() => setSettingsOpen(true)}>{c.settings}</button>
+          <button className="icon-button settings-trigger" aria-label={c.settings} title={c.settings} onClick={() => setSettingsOpen(true)}>⚙</button>
           <button onClick={() => window.noteberry.exportWorkspace(workspace)}>{c.export}</button>
           <button onClick={importWorkspace}>{c.import}</button>
           <button onClick={() => window.noteberry.revealData()}>{c.dataFolder}</button>
@@ -372,18 +372,24 @@ export default function App() {
             <div className="settings-grid">
               <section>
                 <h3>{c.appearance}</h3>
-                <label>{c.language}
-                  <select aria-label={c.language} value={locale} onChange={(event) => setLocale(event.target.value as Locale)}>
-                    <option value="de">Deutsch</option>
-                    <option value="en">English</option>
-                  </select>
-                </label>
-                <label>{c.theme}
-                  <select aria-label={c.theme} value={theme} onChange={(event) => setTheme(event.target.value as Theme)}>
-                    <option value="dark">{c.darkMode}</option>
-                    <option value="light">{c.lightMode}</option>
-                  </select>
-                </label>
+                <SegmentedChoice
+                  label={c.language}
+                  value={locale}
+                  options={[
+                    { value: 'de', label: 'Deutsch' },
+                    { value: 'en', label: 'English' },
+                  ]}
+                  onChange={(value) => setLocale(value as Locale)}
+                />
+                <SegmentedChoice
+                  label={c.theme}
+                  value={theme}
+                  options={[
+                    { value: 'dark', label: c.darkMode },
+                    { value: 'light', label: c.lightMode },
+                  ]}
+                  onChange={(value) => setTheme(value as Theme)}
+                />
               </section>
               <section>
                 <h3>{c.community}</h3>
@@ -398,5 +404,39 @@ export default function App() {
       )}
       {toast && <div className="toast">{toast}</div>}
     </div>
+  )
+}
+
+function SegmentedChoice<T extends string>({
+  label,
+  value,
+  options,
+  onChange,
+}: {
+  label: string
+  value: T
+  options: Array<{ value: T; label: string }>
+  onChange: (value: T) => void
+}) {
+  return (
+    <label className="setting-choice">
+      <span>{label}</span>
+      <select aria-label={label} value={value} onChange={(event) => onChange(event.target.value as T)}>
+        {options.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+      </select>
+      <span className="segmented-control" role="group">
+        {options.map((option) => (
+          <button
+            key={option.value}
+            type="button"
+            className={option.value === value ? 'active' : ''}
+            aria-pressed={option.value === value}
+            onClick={() => onChange(option.value)}
+          >
+            {option.label}
+          </button>
+        ))}
+      </span>
+    </label>
   )
 }
