@@ -38,6 +38,9 @@ export type NoteCopy = {
   templatePreview: string
   useTemplate: string
   noteStructure: string
+  fieldCards: string
+  rawEditor: string
+  noTemplateFields: string
   notes: string
   entries: string
   new: string
@@ -103,6 +106,9 @@ export const COPY: Record<Locale, NoteCopy> = {
     templatePreview: 'Template structure',
     useTemplate: 'Create',
     noteStructure: 'Structure',
+    fieldCards: 'Field cards',
+    rawEditor: 'Raw note',
+    noTemplateFields: 'Blank note. Write freely or choose a category template when creating a new note.',
     notes: 'Notes',
     entries: 'entries',
     new: 'New',
@@ -166,6 +172,9 @@ export const COPY: Record<Locale, NoteCopy> = {
     templatePreview: 'Vorlagenstruktur',
     useTemplate: 'Erstellen',
     noteStructure: 'Struktur',
+    fieldCards: 'Feldkarten',
+    rawEditor: 'Rohnotiz',
+    noTemplateFields: 'Leere Notiz. Frei schreiben oder beim Anlegen eine Kategorievorlage wählen.',
     notes: 'Notizen',
     entries: 'Einträge',
     new: 'Neu',

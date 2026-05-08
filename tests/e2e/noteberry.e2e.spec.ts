@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test'
 import { launchNoteBerry, readSavedWorkspace, sampleWorkspace } from './helpers/noteberryApp'
 
 test.describe('NoteBerry Electron QA', () => {
-  test('renders the note workspace, editor, preview, and intel without broken controls', async ({}, testInfo) => {
+  test('renders the note workspace, raw editor, and field cards without broken controls', async ({}, testInfo) => {
     const { app, page } = await launchNoteBerry(testInfo)
     try {
       await expect(page).toHaveTitle('NoteBerry')
@@ -12,12 +12,10 @@ test.describe('NoteBerry Electron QA', () => {
       await expect(page.locator('.brand span')).toHaveText('Fast D&D notes for prep and play')
       await expect(page.getByRole('heading', { name: 'Notes' })).toBeVisible()
       await expect(page.getByText('Session 7: Clocktower')).toBeVisible()
-      await expect(page.getByRole('heading', { name: 'Editor' })).toBeVisible()
-      await expect(page.getByRole('heading', { name: 'Preview' })).toBeVisible()
-      await expect(page.getByRole('heading', { name: 'Table Intel' })).toBeVisible()
-      await expect(page.locator('.markdown-preview')).toContainText('Reveal the cracked bell clue')
-      await expect(page.locator('.intel-stat', { hasText: 'Todos' })).toContainText('1')
-      await expect(page.locator('.intel-stat', { hasText: 'Links' })).toContainText('1')
+      await expect(page.getByRole('heading', { name: 'Raw note' })).toBeVisible()
+      await expect(page.getByRole('heading', { name: 'Field cards' })).toBeVisible()
+      await expect(page.locator('.field-card')).toContainText('Secret')
+      await expect(page.locator('.mini-list').first()).toContainText('Archivist Nara')
       await expect.poll(() => page.locator('.brand img').evaluate((img) => (img as HTMLImageElement).naturalWidth)).toBeGreaterThan(0)
       await assertVisibleLayout(page)
       await assertNoUnexpectedOverlaps(page)
@@ -31,7 +29,7 @@ test.describe('NoteBerry Electron QA', () => {
       const { app, page } = await launchNoteBerry(testInfo)
     try {
       await expect(page.getByRole('heading', { name: 'Notizen' })).toBeVisible()
-      await expect(page.getByRole('heading', { name: 'Struktur' })).toBeVisible()
+      await expect(page.getByRole('heading', { name: 'Feldkarten' })).toBeVisible()
       await expect(page.getByPlaceholder('Notizen, Tags, Geheimnisse suchen')).toBeVisible()
       await expect(page.locator('.note-card-emoji').first()).toBeVisible()
       await page.getByRole('button', { name: 'Einstellungen' }).click()
@@ -70,19 +68,12 @@ test.describe('NoteBerry Electron QA', () => {
       await expect(page.locator('.note-card')).toContainText('Archivist Nara')
       await page.getByLabel('Tag filter').selectOption('npc')
       await expect(page.locator('.note-card')).toHaveCount(1)
-      await page.getByLabel('Visibility filter').selectOption('secret')
-      await expect(page.locator('.note-card')).toHaveCount(1)
-      await page.getByLabel('Visibility filter').selectOption('gm')
-      await expect(page.locator('.note-card')).toHaveCount(0)
-      await page.getByLabel('Visibility filter').selectOption('__all__')
       await page.locator('.note-card', { hasText: 'Archivist Nara' }).click()
       await expect(page.locator('.mini-list').last()).toContainText('Session 7: Clocktower')
-      await expect(page.locator('.markdown-preview')).toContainText('Session 7: Clocktower')
 
       await page.getByLabel('Search notes').fill('')
       await page.getByLabel('Category filter').selectOption('__all__')
       await page.getByLabel('Tag filter').selectOption('clocktower')
-      await page.getByLabel('Visibility filter').selectOption('__all__')
       await expect(page.locator('.note-card')).toHaveCount(2)
       await page.locator('.tag-cloud').getByRole('button', { name: 'npc' }).click()
       await expect(page.getByLabel('Tag filter')).toHaveValue('npc')
@@ -108,7 +99,9 @@ test.describe('NoteBerry Electron QA', () => {
         { button: 'Handout', title: 'New Handout', content: '## Player-Facing Text', tag: 'handout' },
       ]
       for (const item of expectations) {
-        await page.locator('.template-row').getByRole('button', { name: item.button }).click()
+        await page.getByRole('button', { name: 'New', exact: true }).click()
+        await page.getByRole('dialog').locator('.template-row').getByRole('button', { name: item.button }).click()
+        await page.getByRole('button', { name: 'Create' }).click()
         await expect(page.getByLabel('Title')).toHaveValue(item.title)
         if (item.button !== 'Blank note') await expect(page.locator('.title-edit select')).toHaveValue(item.button)
         await expect(page.getByLabel('Tags')).toHaveValue(item.tag)
@@ -129,22 +122,19 @@ test.describe('NoteBerry Electron QA', () => {
     const { app, page, workspacePath } = await launchNoteBerry(testInfo)
     try {
       await switchToEnglish(page)
-      await page.locator('.template-row').getByRole('button', { name: 'NPC' }).click()
+      await page.getByRole('button', { name: 'New' }).click()
+      await page.getByRole('dialog').locator('.template-row').getByRole('button', { name: 'NPC' }).click()
+      await page.getByRole('button', { name: 'Create' }).click()
       await page.getByLabel('Title').fill('Captain Morn')
       await page.getByLabel('Tags').fill('npc, harbor, ally')
-      await page.locator('.meta-strip select').nth(1).selectOption('table')
       await page.getByLabel('Status').selectOption('active')
-      await page.getByLabel('Note content').fill('## Role\n\nHarbor captain who knows [[Hidden Pier]].\n- TODO: Add **voice cue** and `dock smell`.\n\n*Trusted* by sailors.')
-      await expect(page.locator('.markdown-preview')).toContainText('Harbor captain')
-      await expect(page.locator('.markdown-preview mark')).toContainText('Hidden Pier')
-      await expect(page.locator('.markdown-preview strong')).toContainText('voice cue')
-      await expect(page.locator('.markdown-preview code')).toContainText('dock smell')
-      await expect(page.locator('.markdown-preview em')).toContainText('Trusted')
-      await expect(page.locator('.intel-stat', { hasText: 'Todos' })).toContainText('1')
-      await expect(page.locator('.intel-stat', { hasText: 'Links' })).toContainText('1')
+      await page.getByLabel('Note content').fill('## Role\n- Role: Harbor captain who knows [[Hidden Pier]].\n- TODO: Add voice cue and dock smell.\n- Trust: Trusted by sailors.')
+      await expect(page.getByLabel('Role')).toHaveValue('Harbor captain who knows [[Hidden Pier]].')
+      await page.getByLabel('Role').fill('Harbor master who knows [[Hidden Pier]].')
+      await expect(page.getByLabel('Note content')).toContainText('Harbor master')
       await assertVisibleLayout(page)
       await assertNoUnexpectedOverlaps(page)
-      await expect(page).toHaveScreenshot('noteberry-markdown-edited-desktop.png', { fullPage: true })
+      await expect(page).toHaveScreenshot('noteberry-field-card-edited-desktop.png', { fullPage: true })
 
       await expect.poll(() => {
         const saved = readSavedWorkspace(workspacePath)
@@ -153,10 +143,9 @@ test.describe('NoteBerry Electron QA', () => {
           count: saved.notes.length,
           title: active?.title,
           tags: active?.tags,
-          visibility: active?.visibility,
           status: active?.status,
         }
-      }).toEqual({ count: 3, title: 'Captain Morn', tags: ['npc', 'harbor', 'ally'], visibility: 'table', status: 'active' })
+      }).toEqual({ count: 3, title: 'Captain Morn', tags: ['npc', 'harbor', 'ally'], status: 'active' })
     } finally {
       await app.close()
     }
@@ -170,27 +159,22 @@ test.describe('NoteBerry Electron QA', () => {
     expect(readSavedWorkspace(workspacePath).notes[0].content).toContain('Quick close field report')
   })
 
-  test('updates pinning, status, visibility states, and note ordering', async ({}, testInfo) => {
+  test('updates pinning, status states, and note ordering', async ({}, testInfo) => {
     const { app, page, workspacePath } = await launchNoteBerry(testInfo)
     try {
       await switchToEnglish(page)
       await page.locator('.note-card', { hasText: 'Archivist Nara' }).click()
       await page.getByLabel('Status').selectOption('resolved')
-      await page.locator('.meta-strip select').nth(1).selectOption('table')
       await page.locator('.meta-strip .check-line input').check()
       await expect(page.locator('.note-card').first()).toContainText('Pinned: Archivist Nara')
-      await expect(page.locator('.note-card').first()).toContainText('TABLE')
-
-      await page.locator('.meta-strip select').nth(1).selectOption('secret')
-      await expect(page.locator('.note-card').first()).toContainText('SECRET')
       await page.getByLabel('Status').selectOption('archived')
       await expect(page.locator('.note-card').first()).toContainText('Archived')
       await expect(page).toHaveScreenshot('noteberry-state-ordering-desktop.png', { fullPage: true })
 
       await expect.poll(() => {
         const nara = readSavedWorkspace(workspacePath).notes.find((note) => note.id === 'note-nara')
-        return { pinned: nara?.pinned, visibility: nara?.visibility, status: nara?.status }
-      }).toEqual({ pinned: true, visibility: 'secret', status: 'archived' })
+        return { pinned: nara?.pinned, status: nara?.status }
+      }).toEqual({ pinned: true, status: 'archived' })
     } finally {
       await app.close()
     }
@@ -217,7 +201,6 @@ test.describe('NoteBerry Electron QA', () => {
       await expect(page.getByLabel('Title')).toHaveValue('Untitled Note')
       await expect(page.locator('.title-edit select')).toHaveValue('Session')
       await expect(page.locator('.meta-strip select').nth(0)).toHaveValue('draft')
-      await expect(page.locator('.meta-strip select').nth(1)).toHaveValue('gm')
       const saved = readSavedWorkspace(workspacePath)
       expect(saved.activeNoteId).toBe('damaged')
       expect(saved.notes[0].tags).toEqual(['npc'])
@@ -270,7 +253,7 @@ async function switchToEnglish(page: import('@playwright/test').Page): Promise<v
 async function assertVisibleLayout(page: import('@playwright/test').Page): Promise<void> {
   const failures = await page.evaluate(() => {
     const viewport = { width: window.innerWidth, height: window.innerHeight }
-    const selectors = ['.titlebar', '.brand', '.note-layout', '.notes-panel', '.editor-panel', '.editor-head', '.meta-strip', '.workbench', '.editor-card', '.preview-card', '.intel-card', 'button', 'input', 'select', 'textarea']
+    const selectors = ['.titlebar', '.brand', '.note-layout', '.notes-panel', '.editor-panel', '.editor-head', '.meta-strip', '.workbench', '.editor-card', '.structure-card', '.field-card', 'button', 'input', 'select', 'textarea']
     const result: string[] = []
     const seen = new Set<Element>()
     for (const selector of selectors) {
@@ -283,7 +266,7 @@ async function assertVisibleLayout(page: import('@playwright/test').Page): Promi
         if (rect.width <= 0 || rect.height <= 0) result.push(`${selector} has empty bounds`)
         if (rect.left < -1 || rect.right > viewport.width + 1) result.push(`${selector} overflows horizontally`)
         if (element instanceof HTMLButtonElement && element.scrollWidth > element.clientWidth + 2) result.push(`button text clips: ${element.textContent?.trim()}`)
-        if (element.matches('button, input, select, textarea') && !element.closest('.note-list, .mini-list, .markdown-preview, .intel-card')) {
+        if (element.matches('button, input, select, textarea') && !element.closest('.note-list, .mini-list, .structure-card')) {
           const clippedBy = clippedByHiddenAncestor(element, rect)
           if (clippedBy) result.push(`${selector} is clipped by ${clippedBy}: ${element.textContent?.trim().slice(0, 40)}`)
         }

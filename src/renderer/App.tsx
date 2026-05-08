@@ -4,6 +4,8 @@ import { CATEGORIES, COPY, categoryEmoji, categoryHint, categoryLabel, statusLab
 import logoUrl from '../../resources/logo.png'
 
 type Theme = 'dark' | 'light'
+type NoteField = { lineIndex: number; label: string; value: string }
+type NoteFieldSection = { title: string; fields: NoteField[]; body: string[] }
 
 const GITHUB_URL = 'https://github.com/RollBerryStudios/NoteBerry'
 const ROLLBERRY_URL = 'https://github.com/RollBerryStudios'
@@ -57,6 +59,35 @@ function noteSections(content: string): Array<{ title: string; lines: string[] }
     if (sections.length && line.trim() && !line.startsWith('# ')) sections[sections.length - 1].lines.push(line.replace(/^- /, ''))
   }
   return sections.slice(0, 8)
+}
+
+function noteFieldSections(content: string): NoteFieldSection[] {
+  const sections: NoteFieldSection[] = []
+  const lines = content.split('\n')
+  lines.forEach((line, lineIndex) => {
+    if (line.startsWith('## ')) {
+      sections.push({ title: line.slice(3).trim(), fields: [], body: [] })
+      return
+    }
+    if (!sections.length && line.trim() && !line.startsWith('# ')) sections.push({ title: 'Notiz', fields: [], body: [] })
+    if (!sections.length || !line.trim() || line.startsWith('# ')) return
+    const normalized = line.replace(/^- /, '')
+    const match = normalized.match(/^([^:]{2,42}):\s*(.*)$/)
+    if (match) {
+      sections[sections.length - 1].fields.push({ lineIndex, label: match[1].trim(), value: match[2] })
+    } else {
+      sections[sections.length - 1].body.push(normalized)
+    }
+  })
+  return sections.filter((section) => section.fields.length || section.body.length).slice(0, 8)
+}
+
+function updateFieldLine(content: string, field: NoteField, value: string): string {
+  const lines = content.split('\n')
+  const current = lines[field.lineIndex] ?? ''
+  const prefix = current.match(/^(\s*-?\s*[^:]+:\s*)/)?.[1] ?? `- ${field.label}: `
+  lines[field.lineIndex] = `${prefix}${value}`
+  return lines.join('\n')
 }
 
 function buildNoteIndex(notes: VttNote[]) {
@@ -157,6 +188,7 @@ export default function App() {
     return workspace.notes.filter((note) => note.id !== activeNote.id && (noteIndex.linksById.get(note.id) ?? []).includes(activeNote.title))
   }, [activeNote, noteIndex.linksById, workspace.notes])
   const activeSections = useMemo(() => noteSections(activeNote?.content ?? ''), [activeNote?.content])
+  const activeFieldSections = useMemo(() => noteFieldSections(activeNote?.content ?? ''), [activeNote?.content])
   const draftContent = draftBlank ? '' : templateContent(locale, draftCategory)
   const draftSections = useMemo(() => noteSections(draftContent), [draftContent])
 
@@ -180,6 +212,11 @@ export default function App() {
       ...current,
       notes: current.notes.map((note) => note.id === activeNote.id ? { ...note, ...patch, updatedAt: now() } : note),
     }))
+  }
+
+  function updateActiveField(field: NoteField, value: string): void {
+    if (!activeNote) return
+    updateActive({ content: updateFieldLine(activeNote.content, field, value) })
   }
 
   function createNote(nextCategory = 'Session', blank = false): void {
@@ -300,14 +337,35 @@ export default function App() {
 
           <div className="workbench">
             <section className="editor-card">
-              <h2>{c.editor}</h2>
+              <h2>{c.rawEditor}</h2>
               <textarea aria-label={c.noteContent} value={activeNote.content} onChange={(event) => updateActive({ content: event.target.value })} />
             </section>
             <aside className="structure-card">
+              <h2>{c.fieldCards}</h2>
+              {activeFieldSections.length ? (
+                <div className="template-card-grid field-card-grid">
+                  {activeFieldSections.map((section) => (
+                    <article className="template-card field-card" key={section.title}>
+                      <h3>{section.title}</h3>
+                      <div className="field-grid">
+                        {section.fields.map((field) => (
+                          <label key={`${field.lineIndex}-${field.label}`}>
+                            <span>{field.label}</span>
+                            <input aria-label={field.label} value={field.value} onChange={(event) => updateActiveField(field, event.target.value)} />
+                          </label>
+                        ))}
+                      </div>
+                      {section.body.slice(0, 3).map((line) => <p key={line}>{line}</p>)}
+                    </article>
+                  ))}
+                </div>
+              ) : (
+                <div className="empty-fields">{c.noTemplateFields}</div>
+              )}
               <h2>{c.noteStructure}</h2>
-              <div className="template-card-grid">
-                {(activeSections.length ? activeSections : noteSections(templateContent(locale, activeNote.category))).map((section) => (
-                  <article className="template-card" key={section.title}>
+              <div className="template-card-grid outline-card-grid">
+                {(activeSections.length ? activeSections : []).map((section) => (
+                  <article className="template-card outline-card" key={section.title}>
                     <h3>{section.title}</h3>
                     {section.lines.slice(0, 6).map((line) => <p key={line}>{line}</p>)}
                   </article>
