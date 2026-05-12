@@ -31,8 +31,12 @@ test.describe('NoteBerry Electron QA', () => {
       const { app, page } = await launchNoteBerry(testInfo)
     try {
       await expect(page.getByRole('heading', { name: 'Notizen' })).toBeVisible()
+      await expect(page.getByRole('heading', { name: 'Sitzungsübersicht' })).toBeVisible()
+      await expect(page.getByRole('heading', { name: 'Schnellerfassung' })).toBeVisible()
       await expect(page.getByRole('heading', { name: 'Feldkarten' })).toBeVisible()
       await expect(page.getByPlaceholder('Notizen, Tags, Geheimnisse suchen')).toBeVisible()
+      await expect(page.getByText('Session Desk')).toHaveCount(0)
+      await expect(page.getByText('Quick Capture')).toHaveCount(0)
       await expect(page.locator('.note-card-emoji').first()).toBeVisible()
       await page.getByRole('button', { name: 'Einstellungen' }).click()
       await expect(page.getByRole('dialog', { name: 'Einstellungen' })).toBeVisible()
@@ -270,6 +274,21 @@ async function assertVisibleLayout(page: import('@playwright/test').Page): Promi
         if (rect.width <= 0 || rect.height <= 0) result.push(`${selector} has empty bounds`)
         if (rect.left < -1 || rect.right > viewport.width + 1) result.push(`${selector} overflows horizontally`)
         if (element instanceof HTMLButtonElement && element.scrollWidth > element.clientWidth + 2) result.push(`button text clips: ${element.textContent?.trim()}`)
+        if (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement) {
+          const visibleText = element.placeholder
+          if (visibleText && element.scrollWidth > element.clientWidth + 2) result.push(`${selector} placeholder clips: ${visibleText.slice(0, 40)}`)
+        }
+        if (element instanceof HTMLSelectElement) {
+          const optionText = element.selectedOptions[0]?.textContent?.trim() ?? ''
+          const style = window.getComputedStyle(element)
+          const probe = document.createElement('canvas').getContext('2d')
+          const font = `${style.fontStyle} ${style.fontVariant} ${style.fontWeight} ${style.fontSize} / ${style.lineHeight} ${style.fontFamily}`
+          if (probe && optionText) {
+            probe.font = font
+            const reserve = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight) + 28
+            if (probe.measureText(optionText).width > element.clientWidth - reserve + 1) result.push(`select text clips: ${optionText}`)
+          }
+        }
         if (element.matches('button, input, select, textarea') && !element.closest('.note-list, .mini-list, .structure-card')) {
           const clippedBy = clippedByHiddenAncestor(element, rect)
           if (clippedBy) result.push(`${selector} is clipped by ${clippedBy}: ${element.textContent?.trim().slice(0, 40)}`)

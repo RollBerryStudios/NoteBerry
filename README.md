@@ -31,10 +31,10 @@ Vorbereitung und Spielleitung**. Sie ist für Gruppen gedacht, die ihre Notizen
 neben einer analogen Karte, einem anderen VTT oder einem leichten Online-Setup
 organisieren wollen.
 
-- **Standalone-Notizworkspace** - keine Kampagne oder Cloud-Anmeldung nötig
-- **VTT-Kategorien** - Sessions, NPCs, Orte, Quests, Gegenstände, Lore, Regeln und Handouts
-- **Sichtbarkeit** - GM-, Tisch- und Geheim-Notizen mit eigenem Filter
-- **Session Desk** - tischbereite Handouts, GM-Notizen, Geheimnisse und offene Fäden
+- **Standalone-Notizarbeitsbereich** - keine Kampagne oder Cloud-Anmeldung nötig
+- **VTT-Kategorien** - Sitzungen, NSCs, Orte, Aufträge, Gegenstände, Weltwissen, Regeln und Handouts
+- **Sichtbarkeit** - SL-, Tisch- und Geheim-Notizen mit eigenem Filter
+- **Sitzungsübersicht** - tischbereite Handouts, SL-Notizen, Geheimnisse und offene Fäden
 - **Schnellerfassung** - Einfälle, Hinweise und neue NSCs ohne Kontextwechsel aufnehmen
 - **Markdown-Vorschau** - schnelle Struktur für Vorbereitung und Spieltisch
 - **Mehrsprachig** - Benutzeroberfläche auf Deutsch und Englisch
@@ -61,15 +61,15 @@ Aktuelle Version: **0.1.7**
 
 | Kategorie | Funktion |
 |---|---|
-| **Notizworkspace** | Notizen erstellen, bearbeiten, suchen, filtern, pinnen und löschen |
-| **VTT-Kategorien** | Session, NPC, Location, Quest, Item, Lore, Rules und Handout |
-| **Templates** | Starter für NPC-, Location-, Quest- und Session-Notizen |
+| **Notizarbeitsbereich** | Notizen erstellen, bearbeiten, suchen, filtern, pinnen und löschen |
+| **VTT-Kategorien** | Sitzung, NSC, Ort, Auftrag, Gegenstand, Weltwissen, Regeln und Handout |
+| **Templates** | Starter für NSC-, Orts-, Auftrags- und Sitzungsnotizen |
 | **Tags** | Komma-basierte Tags und Tag-Filter |
-| **Sichtbarkeit** | GM, Table und Secret mit eigenem Sichtbarkeitsfilter |
-| **Session Desk** | Tischbereit, GM-only, Geheimnisse und offene Fäden auf einen Blick |
+| **Sichtbarkeit** | SL, Tisch und Geheim mit eigenem Sichtbarkeitsfilter |
+| **Sitzungsübersicht** | Tischbereit, Nur SL, Geheimnisse und offene Fäden auf einen Blick |
 | **Schnellerfassung** | Neue Notizen direkt aufnehmen, kategorisieren und mit Sichtbarkeit speichern |
 | **Markdown-Vorschau** | Überschriften, Listen, Betonung und Code für lesbare Vorbereitung |
-| **Autosave** | Lokaler JSON-Workspace mit Import/Export und Daten-Normalisierung |
+| **Autosave** | Lokaler JSON-Arbeitsbereich mit Import/Export und Daten-Normalisierung |
 | **Responsive UI** | Desktop- und schmale Layouts per Playwright-Screenshots abgesichert |
 
 ### Schnellstart
@@ -101,7 +101,7 @@ npm run test:e2e:update   # Screenshot-Baselines nach absichtlichen UI-Änderung
 
 Die E2E-Suite startet NoteBerry mit isolierten Testdaten und prüft Rendering,
 Suche, Kategorie-/Tag-/Sichtbarkeitsfilter, Templates, Markdown-Vorschau,
-Session Desk, Schnellerfassung, Persistenz, Normalisierung beschädigter Daten sowie Desktop- und
+Sitzungsübersicht, Schnellerfassung, Persistenz, Normalisierung beschädigter Daten sowie Desktop- und
 Responsive-Screenshots ohne Überlappungen.
 
 ### Lokale Daten
@@ -112,7 +112,7 @@ NoteBerry speichert lokal im Electron-AppData-Verzeichnis:
 data/noteberry-workspace.json
 ```
 
-Der Workspace wird beim Laden normalisiert, damit beschädigte oder veraltete
+Der Arbeitsbereich wird beim Laden normalisiert, damit beschädigte oder veraltete
 Daten die Oberfläche nicht brechen.
 
 ### Projektstruktur

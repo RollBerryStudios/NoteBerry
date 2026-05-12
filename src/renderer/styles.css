@@ -68,6 +68,10 @@ input, select, textarea {
   padding: 8px 10px;
   min-height: var(--rb-control-h);
 }
+select {
+  padding-right: 30px;
+  text-overflow: ellipsis;
+}
 textarea { resize: none; line-height: 24px; }
 label { display: grid; gap: 5px; color: var(--muted); font-size: 12px; font-weight: 650; }
 h1, h2, h3, p { margin-top: 0; }
@@ -161,7 +165,7 @@ h1, h2, h3, p { margin-top: 0; }
 .filters {
   flex: 0 0 auto;
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 8px;
   padding: 10px 12px;
   border-bottom: 1px solid var(--line);
