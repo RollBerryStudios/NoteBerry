@@ -328,6 +328,34 @@ h1, h2, h3, p { margin-top: 0; }
   align-items: end;
   padding: 0 0 10px;
 }
+.note-header {
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: start;
+  padding-bottom: 10px;
+}
+.note-header h2 {
+  margin: 2px 0 0;
+  font-size: 23px;
+  line-height: 1.15;
+}
+.note-kicker {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 750;
+}
+.note-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+}
+.note-mode-switch {
+  min-width: 190px;
+}
 .title-edit { display: grid; grid-template-columns: minmax(260px, 1fr) 170px; gap: 10px; }
 .meta-strip {
   flex: 0 0 auto;
@@ -352,7 +380,7 @@ h1, h2, h3, p { margin-top: 0; }
   gap: 10px;
   padding-top: 10px;
 }
-.editor-card, .structure-card {
+.editor-card, .structure-card, .note-view-card {
   min-height: 0;
   padding: 12px;
   overflow: hidden;
@@ -362,6 +390,10 @@ h1, h2, h3, p { margin-top: 0; }
   border-radius: 8px;
   background: rgba(251, 252, 250, .98);
   box-shadow: var(--shadow);
+}
+.focused-editor {
+  flex: 1;
+  gap: 10px;
 }
 .editor-card h2, .structure-card h2 { margin: 0 0 9px; font-size: 15px; }
 .editor-card textarea {
@@ -373,6 +405,83 @@ h1, h2, h3, p { margin-top: 0; }
   background:
     linear-gradient(90deg, rgba(47, 125, 91, .06) 0 1px, transparent 1px 100%),
     repeating-linear-gradient(180deg, #ffffff 0 25px, #f3f7f1 25px 26px);
+}
+.note-view-card {
+  flex: 1;
+  gap: 12px;
+  overflow: auto;
+}
+.markdown-note {
+  flex: 0 0 auto;
+  max-width: 980px;
+  display: grid;
+  gap: 8px;
+  padding: 4px 2px 10px;
+  line-height: 1.55;
+}
+.markdown-note h1 {
+  margin: 0 0 4px;
+  font-size: 28px;
+  line-height: 1.15;
+}
+.markdown-note h2 {
+  margin: 18px 0 2px;
+  font-size: 17px;
+}
+.markdown-note h3 {
+  margin: 10px 0 0;
+  font-size: 14px;
+}
+.markdown-note p {
+  margin: 0;
+  color: var(--text);
+}
+.markdown-list-item {
+  position: relative;
+  padding-left: 18px;
+}
+.markdown-list-item::before {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: .72em;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+.markdown-gap { height: 4px; }
+.wiki-chip {
+  display: inline-flex;
+  max-width: 100%;
+  padding: 1px 6px;
+  border: 1px solid color-mix(in srgb, var(--accent) 42%, transparent);
+  border-radius: 6px;
+  color: var(--accent);
+  background: var(--accent-soft);
+  font-weight: 750;
+}
+.note-context-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+.note-context-grid article {
+  min-width: 0;
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--surface-2) 58%, transparent);
+}
+.note-context-grid h3 {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
 }
 .structure-card {
   height: 100%;
@@ -452,6 +561,7 @@ h1, h2, h3, p { margin-top: 0; }
 .app-shell[data-theme="dark"] .notes-panel,
 .app-shell[data-theme="dark"] .desk-card,
 .app-shell[data-theme="dark"] .editor-card,
+.app-shell[data-theme="dark"] .note-view-card,
 .app-shell[data-theme="dark"] .structure-card,
 .app-shell[data-theme="dark"] .template-modal,
 .app-shell[data-theme="dark"] .settings-modal {
@@ -483,6 +593,9 @@ h1, h2, h3, p { margin-top: 0; }
   background:
     linear-gradient(90deg, color-mix(in srgb, var(--accent) 10%, transparent) 0 1px, transparent 1px 100%),
     repeating-linear-gradient(180deg, var(--bg) 0 25px, color-mix(in srgb, var(--surface-2) 72%, var(--bg) 28%) 25px 26px);
+}
+.app-shell[data-theme="dark"] .note-context-grid article {
+  background: var(--bg);
 }
 .app-shell[data-theme="dark"] .note-card-emoji { background: rgba(255,255,255,.07); }
 .app-shell[data-theme="dark"] .toast { background: #11170f; color: var(--text); }
@@ -516,7 +629,7 @@ h1, h2, h3, p { margin-top: 0; }
   overflow: hidden;
 }
 .template-modal {
-  width: min(980px, calc(100vw - 32px));
+  width: min(620px, calc(100vw - 32px));
   max-height: calc(100vh - 40px);
   display: flex;
   flex-direction: column;
@@ -543,12 +656,12 @@ h1, h2, h3, p { margin-top: 0; }
   min-height: 0;
   overflow: auto;
   display: grid;
-  grid-template-columns: 310px minmax(0, 1fr);
+  grid-template-columns: 1fr;
   gap: 14px;
   padding: 16px;
 }
 .modal-template-row {
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   align-content: start;
 }
 .template-row button.active {
@@ -607,7 +720,7 @@ h1, h2, h3, p { margin-top: 0; }
     top: 0;
     z-index: 15;
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 6px;
     padding: 8px 12px;
     border-bottom: 1px solid var(--line);
@@ -627,12 +740,10 @@ h1, h2, h3, p { margin-top: 0; }
   .note-layout { grid-template-columns: 1fr; }
   .notes-panel,
   .session-desk,
-  .editor-workspace,
-  .structure-card { display: none; }
+  .editor-workspace { display: none; }
   .notes-panel.mobile-active,
   .session-desk.mobile-active,
-  .editor-workspace.mobile-active,
-  .structure-card.mobile-active { display: grid; }
+  .editor-workspace.mobile-active { display: grid; }
   .editor-panel.mobile-active { display: flex; overflow: visible !important; }
   .editor-workspace.mobile-active { display: flex; }
   .notes-panel.mobile-active { display: flex; max-height: none; overflow: visible; }
@@ -641,9 +752,13 @@ h1, h2, h3, p { margin-top: 0; }
   .template-row button { min-height: 44px; padding: 6px 8px; }
   .title-edit { grid-template-columns: minmax(0, 1fr) 170px; }
   .meta-strip { grid-template-columns: 130px 130px minmax(180px, 1fr) 118px; }
+  .note-header { grid-template-columns: 1fr; }
+  .note-actions { justify-content: flex-start; flex-wrap: wrap; }
+  .note-context-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .workbench { grid-template-columns: 1fr; grid-template-rows: auto minmax(360px, 1fr); }
   .structure-card { max-height: none; height: auto; }
   .editor-card textarea { min-height: 360px; }
+  .modal-template-row { grid-template-columns: 1fr; }
   .template-modal-body { grid-template-columns: 1fr; }
   .settings-grid { grid-template-columns: 1fr; }
   .settings-grid section:first-child { border-right: 0; border-bottom: 1px solid var(--line); }
@@ -653,6 +768,7 @@ h1, h2, h3, p { margin-top: 0; }
   .desk-grid,
   .title-edit,
   .meta-strip,
+  .note-context-grid,
   .quick-capture-controls { grid-template-columns: 1fr; }
 }
 

@@ -4,9 +4,8 @@ import { CATEGORIES, COPY, categoryEmoji, categoryHint, categoryLabel, statusLab
 import logoUrl from '../../resources/logo.png'
 
 type Theme = 'dark' | 'light'
-type NoteField = { lineIndex: number; label: string; value: string }
-type NoteFieldSection = { title: string; fields: NoteField[]; body: string[] }
-type MobileMode = 'notes' | 'session' | 'editor' | 'details'
+type MobileMode = 'notes' | 'session' | 'editor'
+type EditorMode = 'view' | 'edit'
 
 const GITHUB_URL = 'https://github.com/RollBerryStudios/NoteBerry'
 const ROLLBERRY_URL = 'https://github.com/RollBerryStudios'
@@ -49,48 +48,6 @@ function wikiLinks(content: string): string[] {
   return Array.from(content.matchAll(/\[\[([^\]]+)\]\]/g)).map((match) => match[1].trim()).filter(Boolean)
 }
 
-function noteSections(content: string): Array<{ title: string; lines: string[] }> {
-  const sections: Array<{ title: string; lines: string[] }> = []
-  for (const line of content.split('\n')) {
-    if (line.startsWith('## ')) {
-      sections.push({ title: line.slice(3).trim(), lines: [] })
-      continue
-    }
-    if (!sections.length && line.trim() && !line.startsWith('# ')) sections.push({ title: 'Notiz', lines: [] })
-    if (sections.length && line.trim() && !line.startsWith('# ')) sections[sections.length - 1].lines.push(line.replace(/^- /, ''))
-  }
-  return sections.slice(0, 8)
-}
-
-function noteFieldSections(content: string): NoteFieldSection[] {
-  const sections: NoteFieldSection[] = []
-  const lines = content.split('\n')
-  lines.forEach((line, lineIndex) => {
-    if (line.startsWith('## ')) {
-      sections.push({ title: line.slice(3).trim(), fields: [], body: [] })
-      return
-    }
-    if (!sections.length && line.trim() && !line.startsWith('# ')) sections.push({ title: 'Notiz', fields: [], body: [] })
-    if (!sections.length || !line.trim() || line.startsWith('# ')) return
-    const normalized = line.replace(/^- /, '')
-    const match = normalized.match(/^([^:]{2,42}):\s*(.*)$/)
-    if (match) {
-      sections[sections.length - 1].fields.push({ lineIndex, label: match[1].trim(), value: match[2] })
-    } else {
-      sections[sections.length - 1].body.push(normalized)
-    }
-  })
-  return sections.filter((section) => section.fields.length || section.body.length).slice(0, 8)
-}
-
-function updateFieldLine(content: string, field: NoteField, value: string): string {
-  const lines = content.split('\n')
-  const current = lines[field.lineIndex] ?? ''
-  const prefix = current.match(/^(\s*-?\s*[^:]+:\s*)/)?.[1] ?? `- ${field.label}: `
-  lines[field.lineIndex] = `${prefix}${value}`
-  return lines.join('\n')
-}
-
 function buildNoteIndex(notes: VttNote[]) {
   const tagSet = new Set<string>()
   const linksById = new Map<string, string[]>()
@@ -130,6 +87,7 @@ export default function App() {
   const [theme, setThemeState] = useState<Theme>(() => localStorage.getItem('noteberry-theme') === 'light' ? 'light' : 'dark')
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [templateOpen, setTemplateOpen] = useState(false)
+  const [editorMode, setEditorMode] = useState<EditorMode>('view')
   const [draftCategory, setDraftCategory] = useState<NoteCategory>('Session')
   const [draftBlank, setDraftBlank] = useState(false)
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -195,10 +153,11 @@ export default function App() {
 
   const noteIndex = useMemo(() => buildNoteIndex(workspace.notes), [workspace.notes])
   const allTags = noteIndex.allTags
-  const activeSections = useMemo(() => noteSections(activeNote?.content ?? ''), [activeNote?.content])
-  const activeFieldSections = useMemo(() => noteFieldSections(activeNote?.content ?? ''), [activeNote?.content])
-  const draftContent = draftBlank ? '' : templateContent(locale, draftCategory)
-  const draftSections = useMemo(() => noteSections(draftContent), [draftContent])
+  const activeLinks = useMemo(() => wikiLinks(activeNote?.content ?? ''), [activeNote?.content])
+  const backlinks = useMemo(() => {
+    if (!activeNote) return []
+    return workspace.notes.filter((note) => note.id !== activeNote.id && wikiLinks(note.content).includes(activeNote.title)).slice(0, 5)
+  }, [activeNote, workspace.notes])
   const deskNotes = useMemo(() => {
     const visible = workspace.notes.filter((note) => note.status !== 'archived')
     const byUpdate = [...visible].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
@@ -234,19 +193,16 @@ export default function App() {
     }))
   }
 
-  function updateActiveField(field: NoteField, value: string): void {
-    if (!activeNote) return
-    updateActive({ content: updateFieldLine(activeNote.content, field, value) })
-  }
-
   function openNote(id: string): void {
     setWorkspace((current) => ({ ...current, activeNoteId: id }))
+    setEditorMode('view')
     setMobileMode('editor')
   }
 
   function createNote(nextCategory = 'Session', blank = false): void {
     const note = newNote(nextCategory, locale, blank)
     setWorkspace((current) => ({ ...current, activeNoteId: note.id, notes: [note, ...current.notes] }))
+    setEditorMode('edit')
   }
 
   function createSelectedTemplate(): void {
@@ -335,7 +291,6 @@ export default function App() {
           { id: 'notes', label: c.showNotes },
           { id: 'session', label: c.showSession },
           { id: 'editor', label: c.showEditor },
-          { id: 'details', label: c.showDetails },
         ].map((item) => (
           <button key={item.id} className={mobileMode === item.id ? 'active' : ''} onClick={() => setMobileMode(item.id as MobileMode)}>
             {item.label}
@@ -419,79 +374,78 @@ export default function App() {
           </section>
 
           <div className={`editor-workspace ${mobileMode === 'editor' ? 'mobile-active' : ''}`}>
-          <div className="editor-head">
-            <div className="title-edit">
-              <label>{c.title}<input value={activeNote.title} onChange={(event) => updateActive({ title: event.target.value })} /></label>
-              <label>{c.category}
-                <select value={activeNote.category} onChange={(event) => updateActive({ category: event.target.value })}>
-                  {CATEGORIES.map((item) => <option key={item} value={item}>{categoryLabel(locale, item)}</option>)}
-                </select>
-              </label>
+            <div className="note-header">
+              <div>
+                <p className="note-kicker">{categoryEmoji(activeNote.category)} {categoryLabel(locale, activeNote.category)} / {visibilityLabel(locale, activeNote.visibility)} / {statusLabel(locale, activeNote.status)}</p>
+                <h2>{activeNote.title}</h2>
+              </div>
+              <div className="note-actions">
+                <span className="segmented-control note-mode-switch" role="group" aria-label={`${c.preview} / ${c.editor}`}>
+                  <button type="button" className={editorMode === 'view' ? 'active' : ''} aria-pressed={editorMode === 'view'} onClick={() => setEditorMode('view')}>{c.preview}</button>
+                  <button type="button" className={editorMode === 'edit' ? 'active' : ''} aria-pressed={editorMode === 'edit'} onClick={() => setEditorMode('edit')}>{c.editor}</button>
+                </span>
+                <button className="danger" disabled={workspace.notes.length <= 1} onClick={deleteNote}>{c.delete}</button>
+              </div>
             </div>
-            <button className="danger" disabled={workspace.notes.length <= 1} onClick={deleteNote}>{c.delete}</button>
-          </div>
 
-          <div className="meta-strip">
-            <label>{c.status}
-              <select value={activeNote.status} onChange={(event) => updateActive({ status: event.target.value as NoteStatus })}>
-                <option value="draft">{statusLabel(locale, 'draft')}</option>
-                <option value="active">{statusLabel(locale, 'active')}</option>
-                <option value="resolved">{statusLabel(locale, 'resolved')}</option>
-                <option value="archived">{statusLabel(locale, 'archived')}</option>
-              </select>
-            </label>
-            <label>{c.visibility}
-              <select value={activeNote.visibility} onChange={(event) => updateActive({ visibility: event.target.value as NoteVisibility })}>
-                {(['gm', 'table', 'secret'] as const).map((item) => <option key={item} value={item}>{visibilityLabel(locale, item)}</option>)}
-              </select>
-            </label>
-            <label>{c.tags}<input aria-label="Tags" value={activeNote.tags.join(', ')} onChange={(event) => updateActive({ tags: parseTags(event.target.value) })} /></label>
-            <label className="check-line"><input type="checkbox" checked={activeNote.pinned} onChange={(event) => updateActive({ pinned: event.target.checked })} /> {c.pinnedLabel}</label>
-          </div>
-
-          <div className="workbench">
-            <section className="editor-card">
-              <h2>{c.rawEditor}</h2>
-              <textarea aria-label={c.noteContent} value={activeNote.content} onChange={(event) => updateActive({ content: event.target.value })} />
-            </section>
-            <aside className={`structure-card ${mobileMode === 'details' ? 'mobile-active' : ''}`}>
-              <h2>{c.fieldCards}</h2>
-              {activeFieldSections.length ? (
-                <div className="template-card-grid field-card-grid">
-                  {activeFieldSections.map((section) => (
-                    <article className="template-card field-card" key={section.title}>
-                      <h3>{section.title}</h3>
-                      <div className="field-grid">
-                        {section.fields.map((field) => (
-                          <label key={`${field.lineIndex}-${field.label}`}>
-                            <span>{field.label}</span>
-                            <input aria-label={field.label} value={field.value} onChange={(event) => updateActiveField(field, event.target.value)} />
-                          </label>
-                        ))}
-                      </div>
-                      {section.body.slice(0, 3).map((line) => <p key={line}>{line}</p>)}
-                    </article>
-                  ))}
+            {editorMode === 'edit' ? (
+              <section className="editor-card focused-editor">
+                <div className="title-edit">
+                  <label>{c.title}<input value={activeNote.title} onChange={(event) => updateActive({ title: event.target.value })} /></label>
+                  <label>{c.category}
+                    <select value={activeNote.category} onChange={(event) => updateActive({ category: event.target.value })}>
+                      {CATEGORIES.map((item) => <option key={item} value={item}>{categoryLabel(locale, item)}</option>)}
+                    </select>
+                  </label>
                 </div>
-              ) : (
-                <div className="empty-fields">{c.noTemplateFields}</div>
-              )}
-              <h2>{c.noteStructure}</h2>
-              <div className="template-card-grid outline-card-grid">
-                {(activeSections.length ? activeSections : []).map((section) => (
-                  <article className="template-card outline-card" key={section.title}>
-                    <h3>{section.title}</h3>
-                    {section.lines.slice(0, 6).map((line) => <p key={line}>{line}</p>)}
+                <div className="meta-strip">
+                  <label>{c.status}
+                    <select value={activeNote.status} onChange={(event) => updateActive({ status: event.target.value as NoteStatus })}>
+                      <option value="draft">{statusLabel(locale, 'draft')}</option>
+                      <option value="active">{statusLabel(locale, 'active')}</option>
+                      <option value="resolved">{statusLabel(locale, 'resolved')}</option>
+                      <option value="archived">{statusLabel(locale, 'archived')}</option>
+                    </select>
+                  </label>
+                  <label>{c.visibility}
+                    <select value={activeNote.visibility} onChange={(event) => updateActive({ visibility: event.target.value as NoteVisibility })}>
+                      {(['gm', 'table', 'secret'] as const).map((item) => <option key={item} value={item}>{visibilityLabel(locale, item)}</option>)}
+                    </select>
+                  </label>
+                  <label>{c.tags}<input aria-label="Tags" value={activeNote.tags.join(', ')} onChange={(event) => updateActive({ tags: parseTags(event.target.value) })} /></label>
+                  <label className="check-line"><input type="checkbox" checked={activeNote.pinned} onChange={(event) => updateActive({ pinned: event.target.checked })} /> {c.pinnedLabel}</label>
+                </div>
+                <textarea aria-label={c.noteContent} value={activeNote.content} onChange={(event) => updateActive({ content: event.target.value })} />
+              </section>
+            ) : (
+              <section className="note-view-card">
+                <MarkdownNoteView content={activeNote.content} />
+                <div className="note-context-grid">
+                  <article>
+                    <h3>{c.tags}</h3>
+                    <div className="tag-cloud">
+                      {activeNote.tags.length ? activeNote.tags.map((tag) => <button key={tag} onClick={() => setTagFilter(tag)}>{tag}</button>) : <span>{c.noTags}</span>}
+                    </div>
                   </article>
-                ))}
-              </div>
-              <div className="tag-cloud">
-                {activeNote.tags.map((tag) => <button key={tag} onClick={() => setTagFilter(tag)}>{tag}</button>)}
-              </div>
-              <h3>{c.recentNotes}</h3>
-              <div className="mini-list">{deskNotes.recent.map((note) => <button key={note.id} onClick={() => openNote(note.id)}>{note.title}</button>)}</div>
-            </aside>
-          </div>
+                  <article>
+                    <h3>{c.wikiLinks}</h3>
+                    <div className="mini-list">
+                      {activeLinks.length ? activeLinks.map((link) => <span key={link}>{link}</span>) : <span>{c.noLinks}</span>}
+                    </div>
+                  </article>
+                  <article>
+                    <h3>{c.backlinks}</h3>
+                    <div className="mini-list">
+                      {backlinks.length ? backlinks.map((note) => <button key={note.id} onClick={() => openNote(note.id)}>{note.title}</button>) : <span>{c.noBacklinks}</span>}
+                    </div>
+                  </article>
+                  <article>
+                    <h3>{c.recentNotes}</h3>
+                    <div className="mini-list">{deskNotes.recent.map((note) => <button key={note.id} onClick={() => openNote(note.id)}>{note.title}</button>)}</div>
+                  </article>
+                </div>
+              </section>
+            )}
           </div>
         </section>
       </main>
@@ -518,18 +472,6 @@ export default function App() {
                   </button>
                 ))}
               </div>
-              <section className="template-preview">
-                <h3>{c.templatePreview}</h3>
-                <div className="template-card-grid">
-                  {(draftBlank ? [] : draftSections).map((section) => (
-                    <article className="template-card" key={section.title}>
-                      <h3>{section.title}</h3>
-                      {section.lines.slice(0, 6).map((line) => <p key={line}>{line}</p>)}
-                    </article>
-                  ))}
-                  {draftBlank && <article className="template-card empty-template"><h3>{c.blank}</h3><p>{c.blankHint}</p></article>}
-                </div>
-              </section>
             </div>
             <footer>
               <button onClick={() => setTemplateOpen(false)}>{c.close}</button>
@@ -623,6 +565,31 @@ function SegmentedChoice<T extends string>({
       </span>
     </label>
   )
+}
+
+function MarkdownNoteView({ content }: { content: string }) {
+  const lines = content.split('\n')
+  return (
+    <div className="markdown-note">
+      {lines.map((line, index) => {
+        const key = `${index}-${line}`
+        if (!line.trim()) return <div className="markdown-gap" key={key} />
+        if (line.startsWith('# ')) return <h1 key={key}>{renderInline(line.slice(2))}</h1>
+        if (line.startsWith('## ')) return <h2 key={key}>{renderInline(line.slice(3))}</h2>
+        if (line.startsWith('### ')) return <h3 key={key}>{renderInline(line.slice(4))}</h3>
+        if (line.startsWith('- ')) return <p className="markdown-list-item" key={key}>{renderInline(line.slice(2))}</p>
+        return <p key={key}>{renderInline(line)}</p>
+      })}
+    </div>
+  )
+}
+
+function renderInline(value: string) {
+  const parts = value.split(/(\[\[[^\]]+\]\])/g).filter(Boolean)
+  return parts.map((part, index) => {
+    const match = part.match(/^\[\[([^\]]+)\]\]$/)
+    return match ? <span className="wiki-chip" key={`${part}-${index}`}>{match[1]}</span> : part
+  })
 }
 
 function DeskColumn({

@@ -35,12 +35,7 @@ export type NoteCopy = {
   fileActions: string
   createNote: string
   chooseTemplate: string
-  templatePreview: string
   useTemplate: string
-  noteStructure: string
-  fieldCards: string
-  rawEditor: string
-  noTemplateFields: string
   notes: string
   entries: string
   new: string
@@ -48,7 +43,6 @@ export type NoteCopy = {
   allCategories: string
   allTags: string
   allVisibility: string
-  templates: string
   blank: string
   blankHint: string
   blankTitle: string
@@ -63,8 +57,6 @@ export type NoteCopy = {
   pinnedLabel: string
   editor: string
   preview: string
-  intel: string
-  todos: string
   links: string
   wikiLinks: string
   backlinks: string
@@ -90,7 +82,6 @@ export type NoteCopy = {
   showNotes: string
   showSession: string
   showEditor: string
-  showDetails: string
   noDeskItems: string
   captureEmpty: string
   importInvalid: string
@@ -121,12 +112,7 @@ export const COPY: Record<Locale, NoteCopy> = {
     fileActions: 'File',
     createNote: 'Create note',
     chooseTemplate: 'Choose a note template',
-    templatePreview: 'Template structure',
     useTemplate: 'Create',
-    noteStructure: 'Structure',
-    fieldCards: 'Field cards',
-    rawEditor: 'Raw note',
-    noTemplateFields: 'Blank note. Write freely or choose a category template when creating a new note.',
     notes: 'Notes',
     entries: 'entries',
     new: 'New',
@@ -134,7 +120,6 @@ export const COPY: Record<Locale, NoteCopy> = {
     allCategories: 'All categories',
     allTags: 'All tags',
     allVisibility: 'All visibility',
-    templates: 'Templates',
     blank: 'Blank note',
     blankHint: 'Empty page',
     blankTitle: 'Blank note',
@@ -147,10 +132,8 @@ export const COPY: Record<Locale, NoteCopy> = {
     visibility: 'Visibility',
     tags: 'Tags',
     pinnedLabel: 'Pinned',
-    editor: 'Editor',
-    preview: 'Preview',
-    intel: 'Table Intel',
-    todos: 'Todos',
+    editor: 'Edit',
+    preview: 'View',
     links: 'Links',
     wikiLinks: 'Wiki Links',
     backlinks: 'Backlinks',
@@ -176,7 +159,6 @@ export const COPY: Record<Locale, NoteCopy> = {
     showNotes: 'Notes',
     showSession: 'Session',
     showEditor: 'Editor',
-    showDetails: 'Details',
     noDeskItems: 'Nothing here yet',
     captureEmpty: 'Write something to capture first',
     importInvalid: 'Import canceled or invalid',
@@ -205,12 +187,7 @@ export const COPY: Record<Locale, NoteCopy> = {
     fileActions: 'Datei',
     createNote: 'Notiz erstellen',
     chooseTemplate: 'Notizvorlage wählen',
-    templatePreview: 'Vorlagenstruktur',
     useTemplate: 'Erstellen',
-    noteStructure: 'Struktur',
-    fieldCards: 'Feldkarten',
-    rawEditor: 'Rohnotiz',
-    noTemplateFields: 'Leere Notiz. Frei schreiben oder beim Anlegen eine Kategorievorlage wählen.',
     notes: 'Notizen',
     entries: 'Einträge',
     new: 'Neu',
@@ -218,7 +195,6 @@ export const COPY: Record<Locale, NoteCopy> = {
     allCategories: 'Alle Kategorien',
     allTags: 'Alle Tags',
     allVisibility: 'Alle Sichtbarkeiten',
-    templates: 'Vorlagen',
     blank: 'Leere Notiz',
     blankHint: 'Ohne Vorlage',
     blankTitle: 'Leere Notiz',
@@ -231,10 +207,8 @@ export const COPY: Record<Locale, NoteCopy> = {
     visibility: 'Sichtbarkeit',
     tags: 'Tags',
     pinnedLabel: 'Angepinnt',
-    editor: 'Editor',
-    preview: 'Vorschau',
-    intel: 'Tisch-Intel',
-    todos: 'Todos',
+    editor: 'Bearbeiten',
+    preview: 'Ansicht',
     links: 'Links',
     wikiLinks: 'Wiki-Links',
     backlinks: 'Backlinks',
@@ -260,7 +234,6 @@ export const COPY: Record<Locale, NoteCopy> = {
     showNotes: 'Notizen',
     showSession: 'Runde',
     showEditor: 'Editor',
-    showDetails: 'Details',
     noDeskItems: 'Noch nichts vorhanden',
     captureEmpty: 'Erst etwas für die Erfassung schreiben',
     importInvalid: 'Import abgebrochen oder ungültig',
