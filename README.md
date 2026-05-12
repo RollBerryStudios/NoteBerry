@@ -11,7 +11,7 @@
 
 <p align="center">
   <img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-yellow.svg">
-  <img alt="Version" src="https://img.shields.io/badge/version-0.1.1-blue.svg">
+  <img alt="Version" src="https://img.shields.io/badge/version-0.1.7-blue.svg">
   <img alt="Electron" src="https://img.shields.io/badge/Electron-41-47848F?logo=electron&logoColor=white">
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white">
   <img alt="React" src="https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white">
@@ -34,8 +34,9 @@ organisieren wollen.
 - **Standalone-Notizworkspace** - keine Kampagne oder Cloud-Anmeldung nötig
 - **VTT-Kategorien** - Sessions, NPCs, Orte, Quests, Gegenstände, Lore, Regeln und Handouts
 - **Sichtbarkeit** - GM-, Tisch- und Geheim-Notizen mit eigenem Filter
+- **Session Desk** - tischbereite Handouts, GM-Notizen, Geheimnisse und offene Fäden
+- **Schnellerfassung** - Einfälle, Hinweise und neue NSCs ohne Kontextwechsel aufnehmen
 - **Markdown-Vorschau** - schnelle Struktur für Vorbereitung und Spieltisch
-- **Wiki-Links & Backlinks** - Verknüpfungen über `[[Name]]`
 - **Mehrsprachig** - Benutzeroberfläche auf Deutsch und Englisch
 
 Gebaut mit Electron, React, TypeScript und Vite. Läuft auf macOS, Windows und
@@ -43,18 +44,18 @@ Linux.
 
 ### Aktueller Release
 
-Aktuelle Version: **0.1.1**
+Aktuelle Version: **0.1.7**
 
 - [Neueste Release herunterladen](https://github.com/RollBerryStudios/NoteBerry/releases/latest)
 - [Alle Releases anzeigen](https://github.com/RollBerryStudios/NoteBerry/releases)
-- Direkter Tag: [v0.1.1](https://github.com/RollBerryStudios/NoteBerry/releases/tag/v0.1.1)
+- Direkter Tag: [v0.1.7](https://github.com/RollBerryStudios/NoteBerry/releases/tag/v0.1.7)
 
 | Plattform | Artefakt in der Release |
 |---|---|
-| Windows x64 | `NoteBerry.Setup.0.1.1.exe` |
-| Linux x64 | `NoteBerry-0.1.1.AppImage`, `noteberry_0.1.1_amd64.deb` |
-| macOS x64 | `NoteBerry-0.1.1.dmg`, `NoteBerry-0.1.1-mac.zip` |
-| macOS Apple Silicon | `NoteBerry-0.1.1-arm64.dmg`, `NoteBerry-0.1.1-arm64-mac.zip` |
+| Windows x64 | `NoteBerry.Setup.0.1.7.exe` |
+| Linux x64 | `NoteBerry-0.1.7.AppImage`, `noteberry_0.1.7_amd64.deb` |
+| macOS x64 | `NoteBerry-0.1.7.dmg`, `NoteBerry-0.1.7-mac.zip` |
+| macOS Apple Silicon | `NoteBerry-0.1.7-arm64.dmg`, `NoteBerry-0.1.7-arm64-mac.zip` |
 
 ### Features
 
@@ -65,8 +66,9 @@ Aktuelle Version: **0.1.1**
 | **Templates** | Starter für NPC-, Location-, Quest- und Session-Notizen |
 | **Tags** | Komma-basierte Tags und Tag-Filter |
 | **Sichtbarkeit** | GM, Table und Secret mit eigenem Sichtbarkeitsfilter |
-| **Markdown-Vorschau** | Überschriften, Listen, Betonung, Code und Wiki-Link-Markierung |
-| **Table Intel** | TODO-Zähler, Wiki-Links, Tag-Chips und Backlinks |
+| **Session Desk** | Tischbereit, GM-only, Geheimnisse und offene Fäden auf einen Blick |
+| **Schnellerfassung** | Neue Notizen direkt aufnehmen, kategorisieren und mit Sichtbarkeit speichern |
+| **Markdown-Vorschau** | Überschriften, Listen, Betonung und Code für lesbare Vorbereitung |
 | **Autosave** | Lokaler JSON-Workspace mit Import/Export und Daten-Normalisierung |
 | **Responsive UI** | Desktop- und schmale Layouts per Playwright-Screenshots abgesichert |
 
@@ -99,7 +101,7 @@ npm run test:e2e:update   # Screenshot-Baselines nach absichtlichen UI-Änderung
 
 Die E2E-Suite startet NoteBerry mit isolierten Testdaten und prüft Rendering,
 Suche, Kategorie-/Tag-/Sichtbarkeitsfilter, Templates, Markdown-Vorschau,
-Table Intel, Persistenz, Normalisierung beschädigter Daten sowie Desktop- und
+Session Desk, Schnellerfassung, Persistenz, Normalisierung beschädigter Daten sowie Desktop- und
 Responsive-Screenshots ohne Überlappungen.
 
 ### Lokale Daten
@@ -157,8 +159,9 @@ analog map, another VTT, or a lightweight online setup.
 - **Standalone note workspace** - no campaign suite or cloud account required
 - **VTT categories** - sessions, NPCs, locations, quests, items, lore, rules, and handouts
 - **Visibility** - GM, table, and secret notes with a dedicated filter
+- **Session Desk** - table-ready handouts, GM notes, secrets, and open threads
+- **Quick Capture** - capture ideas, clues, and new NPCs without losing context
 - **Markdown preview** - quick structure for prep and live play
-- **Wiki links & backlinks** - connect notes with `[[Name]]`
 - **Multilingual** - English and German interface
 
 Built with Electron, React, TypeScript, and Vite. Runs on macOS, Windows, and
@@ -166,18 +169,18 @@ Linux.
 
 ### Current Release
 
-Current version: **0.1.1**
+Current version: **0.1.7**
 
 - [Download the latest release](https://github.com/RollBerryStudios/NoteBerry/releases/latest)
 - [View all releases](https://github.com/RollBerryStudios/NoteBerry/releases)
-- Direct tag: [v0.1.1](https://github.com/RollBerryStudios/NoteBerry/releases/tag/v0.1.1)
+- Direct tag: [v0.1.7](https://github.com/RollBerryStudios/NoteBerry/releases/tag/v0.1.7)
 
 | Platform | Release artifact |
 |---|---|
-| Windows x64 | `NoteBerry.Setup.0.1.1.exe` |
-| Linux x64 | `NoteBerry-0.1.1.AppImage`, `noteberry_0.1.1_amd64.deb` |
-| macOS x64 | `NoteBerry-0.1.1.dmg`, `NoteBerry-0.1.1-mac.zip` |
-| macOS Apple Silicon | `NoteBerry-0.1.1-arm64.dmg`, `NoteBerry-0.1.1-arm64-mac.zip` |
+| Windows x64 | `NoteBerry.Setup.0.1.7.exe` |
+| Linux x64 | `NoteBerry-0.1.7.AppImage`, `noteberry_0.1.7_amd64.deb` |
+| macOS x64 | `NoteBerry-0.1.7.dmg`, `NoteBerry-0.1.7-mac.zip` |
+| macOS Apple Silicon | `NoteBerry-0.1.7-arm64.dmg`, `NoteBerry-0.1.7-arm64-mac.zip` |
 
 ### Features
 
@@ -188,8 +191,9 @@ Current version: **0.1.1**
 | **Templates** | Starters for NPC, Location, Quest, and Session notes |
 | **Tags** | Comma-based tags and tag filters |
 | **Visibility** | GM, Table, and Secret with a dedicated visibility filter |
-| **Markdown Preview** | Headings, lists, emphasis, code, and wiki link highlighting |
-| **Table Intel** | TODO counter, wiki links, tag chips, and backlinks |
+| **Session Desk** | Table-ready, GM-only, secret, and open-thread notes at a glance |
+| **Quick Capture** | Capture, categorize, and save new notes with visibility in one flow |
+| **Markdown Preview** | Headings, lists, emphasis, and code for readable prep |
 | **Autosave** | Local JSON workspace with import/export and data normalization |
 | **Responsive UI** | Desktop and narrow layouts covered by Playwright screenshots |
 
@@ -222,7 +226,7 @@ npm run test:e2e:update   # Refresh screenshot baselines after intentional UI ch
 
 The E2E suite launches NoteBerry with isolated test data and validates
 rendering, search, category/tag/visibility filters, templates, markdown
-preview, table intel, persistence, damaged data normalization, and
+preview, Session Desk, Quick Capture, persistence, damaged data normalization, and
 desktop/responsive screenshots without layout overlaps.
 
 ### Local Data

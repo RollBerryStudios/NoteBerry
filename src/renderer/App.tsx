@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import type { NoteStatus, NoteWorkspace, VttNote } from '../preload/preload'
-import { CATEGORIES, COPY, categoryEmoji, categoryHint, categoryLabel, statusLabel, templateContent, type Locale, type NoteCategory } from './i18n'
+import type { NoteStatus, NoteVisibility, NoteWorkspace, VttNote } from '../preload/preload'
+import { CATEGORIES, COPY, categoryEmoji, categoryHint, categoryLabel, statusLabel, templateContent, visibilityLabel, type Locale, type NoteCategory } from './i18n'
 import logoUrl from '../../resources/logo.png'
 
 type Theme = 'dark' | 'light'
 type NoteField = { lineIndex: number; label: string; value: string }
 type NoteFieldSection = { title: string; fields: NoteField[]; body: string[] }
+type MobileMode = 'notes' | 'session' | 'editor' | 'details'
 
 const GITHUB_URL = 'https://github.com/RollBerryStudios/NoteBerry'
 const ROLLBERRY_URL = 'https://github.com/RollBerryStudios'
@@ -106,12 +107,24 @@ function buildNoteIndex(notes: VttNote[]) {
   }
 }
 
+function noteSnippet(note: VttNote): string {
+  return note.content
+    .split('\n')
+    .map((line) => line.replace(/^#+\s*/, '').replace(/^- /, '').trim())
+    .find(Boolean) ?? ''
+}
+
 export default function App() {
   const [workspace, setWorkspace] = useState<NoteWorkspace>(emptyWorkspace)
   const [ready, setReady] = useState(false)
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('__all__')
   const [tagFilter, setTagFilter] = useState('__all__')
+  const [visibilityFilter, setVisibilityFilter] = useState('__all__')
+  const [mobileMode, setMobileMode] = useState<MobileMode>('session')
+  const [quickText, setQuickText] = useState('')
+  const [quickCategory, setQuickCategory] = useState<NoteCategory>('Session')
+  const [quickVisibility, setQuickVisibility] = useState<NoteVisibility>('gm')
   const [toast, setToast] = useState<string | null>(null)
   const [locale, setLocaleState] = useState<Locale>(() => localStorage.getItem('noteberry-locale') === 'en' ? 'en' : 'de')
   const [theme, setThemeState] = useState<Theme>(() => localStorage.getItem('noteberry-theme') === 'light' ? 'light' : 'dark')
@@ -182,24 +195,31 @@ export default function App() {
 
   const noteIndex = useMemo(() => buildNoteIndex(workspace.notes), [workspace.notes])
   const allTags = noteIndex.allTags
-  const links = activeNote ? noteIndex.linksById.get(activeNote.id) ?? [] : []
-  const backlinks = useMemo(() => {
-    if (!activeNote) return []
-    return workspace.notes.filter((note) => note.id !== activeNote.id && (noteIndex.linksById.get(note.id) ?? []).includes(activeNote.title))
-  }, [activeNote, noteIndex.linksById, workspace.notes])
   const activeSections = useMemo(() => noteSections(activeNote?.content ?? ''), [activeNote?.content])
   const activeFieldSections = useMemo(() => noteFieldSections(activeNote?.content ?? ''), [activeNote?.content])
   const draftContent = draftBlank ? '' : templateContent(locale, draftCategory)
   const draftSections = useMemo(() => noteSections(draftContent), [draftContent])
+  const deskNotes = useMemo(() => {
+    const visible = workspace.notes.filter((note) => note.status !== 'archived')
+    const byUpdate = [...visible].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
+    return {
+      table: byUpdate.filter((note) => note.visibility === 'table').slice(0, 4),
+      gm: byUpdate.filter((note) => note.visibility === 'gm' || note.pinned).slice(0, 4),
+      secrets: byUpdate.filter((note) => note.visibility === 'secret').slice(0, 4),
+      threads: byUpdate.filter((note) => note.status === 'active' || note.category === 'Quest').slice(0, 5),
+      recent: byUpdate.slice(0, 5),
+    }
+  }, [workspace.notes])
 
   const filteredNotes = useMemo(() => {
     const q = search.trim().toLowerCase()
     return workspace.notes
       .filter((note) => category === '__all__' || note.category === category)
       .filter((note) => tagFilter === '__all__' || note.tags.includes(tagFilter))
+      .filter((note) => visibilityFilter === '__all__' || note.visibility === visibilityFilter)
       .filter((note) => !q || (noteIndex.searchById.get(note.id) ?? '').includes(q))
       .sort((a, b) => Number(b.pinned) - Number(a.pinned) || b.updatedAt.localeCompare(a.updatedAt))
-  }, [category, noteIndex.searchById, search, tagFilter, workspace.notes])
+  }, [category, noteIndex.searchById, search, tagFilter, visibilityFilter, workspace.notes])
 
   function notify(message: string): void {
     setToast(message)
@@ -219,6 +239,11 @@ export default function App() {
     updateActive({ content: updateFieldLine(activeNote.content, field, value) })
   }
 
+  function openNote(id: string): void {
+    setWorkspace((current) => ({ ...current, activeNoteId: id }))
+    setMobileMode('editor')
+  }
+
   function createNote(nextCategory = 'Session', blank = false): void {
     const note = newNote(nextCategory, locale, blank)
     setWorkspace((current) => ({ ...current, activeNoteId: note.id, notes: [note, ...current.notes] }))
@@ -227,6 +252,30 @@ export default function App() {
   function createSelectedTemplate(): void {
     createNote(draftCategory, draftBlank)
     setTemplateOpen(false)
+    setMobileMode('editor')
+  }
+
+  function captureQuickNote(): void {
+    const value = quickText.trim()
+    if (!value) {
+      notify(c.captureEmpty)
+      return
+    }
+    const [firstLine, ...rest] = value.split('\n')
+    const title = firstLine.slice(0, 72).trim() || c.newTitle(quickCategory)
+    const body = rest.join('\n').trim()
+    const note: VttNote = {
+      ...newNote(quickCategory, locale, true),
+      title,
+      content: body ? `# ${title}\n\n${body}` : `# ${title}\n\n- `,
+      tags: [quickCategory.toLowerCase()],
+      status: 'active',
+      visibility: quickVisibility,
+      pinned: quickCategory === 'Session',
+    }
+    setWorkspace((current) => ({ ...current, activeNoteId: note.id, notes: [note, ...current.notes] }))
+    setQuickText('')
+    setMobileMode('session')
   }
 
   async function deleteNote(): Promise<void> {
@@ -253,6 +302,17 @@ export default function App() {
     }
   }
 
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setTemplateOpen(false)
+        setSettingsOpen(false)
+      }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [])
+
   if (!ready || !activeNote) return <div className="loading">Loading NoteBerry...</div>
 
   return (
@@ -270,8 +330,21 @@ export default function App() {
         </div>
       </header>
 
+      <nav className="mobile-mode-nav" aria-label="NoteBerry sections">
+        {[
+          { id: 'notes', label: c.showNotes },
+          { id: 'session', label: c.showSession },
+          { id: 'editor', label: c.showEditor },
+          { id: 'details', label: c.showDetails },
+        ].map((item) => (
+          <button key={item.id} className={mobileMode === item.id ? 'active' : ''} onClick={() => setMobileMode(item.id as MobileMode)}>
+            {item.label}
+          </button>
+        ))}
+      </nav>
+
       <main className="note-layout">
-        <aside className="notes-panel">
+        <aside className={`notes-panel ${mobileMode === 'notes' ? 'mobile-active' : ''}`}>
           <div className="panel-head">
             <div>
               <h2>{c.notes}</h2>
@@ -283,6 +356,21 @@ export default function App() {
               setTemplateOpen(true)
             }}>{c.new}</button>
           </div>
+          <section className="quick-capture" aria-label={c.quickCapture}>
+            <div className="section-line">
+              <h3>{c.quickCapture}</h3>
+              <button className="primary" onClick={captureQuickNote}>{c.capture}</button>
+            </div>
+            <textarea value={quickText} onChange={(event) => setQuickText(event.target.value)} placeholder={c.quickCapturePlaceholder} />
+            <div className="quick-capture-controls">
+              <select aria-label={c.category} value={quickCategory} onChange={(event) => setQuickCategory(event.target.value as NoteCategory)}>
+                {CATEGORIES.map((item) => <option key={item} value={item}>{categoryLabel(locale, item)}</option>)}
+              </select>
+              <select aria-label={c.visibility} value={quickVisibility} onChange={(event) => setQuickVisibility(event.target.value as NoteVisibility)}>
+                {(['gm', 'table', 'secret'] as const).map((item) => <option key={item} value={item}>{visibilityLabel(locale, item)}</option>)}
+              </select>
+            </div>
+          </section>
           <div className="filters">
             <input aria-label={c.searchNotes} value={search} onChange={(event) => setSearch(event.target.value)} placeholder={c.search} />
             <select aria-label={c.categoryFilter} value={category} onChange={(event) => setCategory(event.target.value)}>
@@ -293,23 +381,44 @@ export default function App() {
               <option value="__all__">{c.allTags}</option>
               {allTags.map((tag) => <option key={tag} value={tag}>{tag}</option>)}
             </select>
+            <select aria-label={c.visibilityFilter} value={visibilityFilter} onChange={(event) => setVisibilityFilter(event.target.value)}>
+              <option value="__all__">{c.allVisibility}</option>
+              {(['gm', 'table', 'secret'] as const).map((item) => <option key={item} value={item}>{visibilityLabel(locale, item)}</option>)}
+            </select>
           </div>
           <div className="note-list">
             {filteredNotes.map((note) => (
               <button
                 key={note.id}
                 className={`note-card ${note.id === activeNote.id ? 'active' : ''}`}
-                onClick={() => setWorkspace((current) => ({ ...current, activeNoteId: note.id }))}
+                onClick={() => openNote(note.id)}
               >
                 <span className="note-card-emoji" aria-hidden="true">{categoryEmoji(note.category)}</span>
                 <strong>{note.pinned ? c.pinned : ''}{note.title}</strong>
-                <em>{categoryLabel(locale, note.category)} / {statusLabel(locale, note.status)} / {note.tags.join(', ') || c.noTags}</em>
+                <em>{categoryLabel(locale, note.category)} / {visibilityLabel(locale, note.visibility)} / {statusLabel(locale, note.status)}</em>
               </button>
             ))}
           </div>
         </aside>
 
-        <section className="editor-panel">
+        <section className={`editor-panel ${mobileMode === 'session' || mobileMode === 'editor' || mobileMode === 'details' ? 'mobile-active' : ''}`}>
+          <section className={`session-desk ${mobileMode === 'session' ? 'mobile-active' : ''}`}>
+            <div className="desk-head">
+              <div>
+                <h2>{c.sessionDesk}</h2>
+                <p>{c.sessionDeskHint}</p>
+              </div>
+              <span>{workspace.notes.filter((note) => note.status === 'active').length} {statusLabel(locale, 'active')}</span>
+            </div>
+            <div className="desk-grid">
+              <DeskColumn title={c.tableReady} notes={deskNotes.table} locale={locale} empty={c.noDeskItems} onOpen={openNote} />
+              <DeskColumn title={c.gmOnly} notes={deskNotes.gm} locale={locale} empty={c.noDeskItems} onOpen={openNote} />
+              <DeskColumn title={c.secrets} notes={deskNotes.secrets} locale={locale} empty={c.noDeskItems} onOpen={openNote} />
+              <DeskColumn title={c.openThreads} notes={deskNotes.threads} locale={locale} empty={c.noDeskItems} onOpen={openNote} />
+            </div>
+          </section>
+
+          <div className={`editor-workspace ${mobileMode === 'editor' ? 'mobile-active' : ''}`}>
           <div className="editor-head">
             <div className="title-edit">
               <label>{c.title}<input value={activeNote.title} onChange={(event) => updateActive({ title: event.target.value })} /></label>
@@ -331,6 +440,11 @@ export default function App() {
                 <option value="archived">{statusLabel(locale, 'archived')}</option>
               </select>
             </label>
+            <label>{c.visibility}
+              <select value={activeNote.visibility} onChange={(event) => updateActive({ visibility: event.target.value as NoteVisibility })}>
+                {(['gm', 'table', 'secret'] as const).map((item) => <option key={item} value={item}>{visibilityLabel(locale, item)}</option>)}
+              </select>
+            </label>
             <label>{c.tags}<input aria-label="Tags" value={activeNote.tags.join(', ')} onChange={(event) => updateActive({ tags: parseTags(event.target.value) })} /></label>
             <label className="check-line"><input type="checkbox" checked={activeNote.pinned} onChange={(event) => updateActive({ pinned: event.target.checked })} /> {c.pinnedLabel}</label>
           </div>
@@ -340,7 +454,7 @@ export default function App() {
               <h2>{c.rawEditor}</h2>
               <textarea aria-label={c.noteContent} value={activeNote.content} onChange={(event) => updateActive({ content: event.target.value })} />
             </section>
-            <aside className="structure-card">
+            <aside className={`structure-card ${mobileMode === 'details' ? 'mobile-active' : ''}`}>
               <h2>{c.fieldCards}</h2>
               {activeFieldSections.length ? (
                 <div className="template-card-grid field-card-grid">
@@ -374,11 +488,10 @@ export default function App() {
               <div className="tag-cloud">
                 {activeNote.tags.map((tag) => <button key={tag} onClick={() => setTagFilter(tag)}>{tag}</button>)}
               </div>
-              <h3>{c.wikiLinks}</h3>
-              <div className="mini-list">{links.length ? links.map((link) => <span key={link}>{link}</span>) : <em>{c.noLinks}</em>}</div>
-              <h3>{c.backlinks}</h3>
-              <div className="mini-list">{backlinks.length ? backlinks.map((note) => <button key={note.id} onClick={() => setWorkspace((current) => ({ ...current, activeNoteId: note.id }))}>{note.title}</button>) : <em>{c.noBacklinks}</em>}</div>
+              <h3>{c.recentNotes}</h3>
+              <div className="mini-list">{deskNotes.recent.map((note) => <button key={note.id} onClick={() => openNote(note.id)}>{note.title}</button>)}</div>
             </aside>
+          </div>
           </div>
         </section>
       </main>
@@ -509,5 +622,34 @@ function SegmentedChoice<T extends string>({
         ))}
       </span>
     </label>
+  )
+}
+
+function DeskColumn({
+  title,
+  notes,
+  locale,
+  empty,
+  onOpen,
+}: {
+  title: string
+  notes: VttNote[]
+  locale: Locale
+  empty: string
+  onOpen: (id: string) => void
+}) {
+  return (
+    <section className="desk-card">
+      <h3>{title}</h3>
+      <div className="desk-list">
+        {notes.length ? notes.map((note) => (
+          <button key={note.id} onClick={() => onOpen(note.id)}>
+            <strong>{note.title}</strong>
+            <span>{categoryLabel(locale, note.category)} / {statusLabel(locale, note.status)}</span>
+            {noteSnippet(note) && <em>{noteSnippet(note)}</em>}
+          </button>
+        )) : <p>{empty}</p>}
+      </div>
+    </section>
   )
 }

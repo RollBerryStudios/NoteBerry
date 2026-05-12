@@ -75,6 +75,24 @@ export type NoteCopy = {
   tagFilter: string
   visibilityFilter: string
   noteContent: string
+  sessionDesk: string
+  sessionDeskHint: string
+  quickCapture: string
+  quickCapturePlaceholder: string
+  capture: string
+  tableReady: string
+  gmOnly: string
+  secrets: string
+  openThreads: string
+  recentNotes: string
+  activeNote: string
+  details: string
+  showNotes: string
+  showSession: string
+  showEditor: string
+  showDetails: string
+  noDeskItems: string
+  captureEmpty: string
   importInvalid: string
   workspaceImported: string
   importFailed: string
@@ -143,6 +161,24 @@ export const COPY: Record<Locale, NoteCopy> = {
     tagFilter: 'Tag filter',
     visibilityFilter: 'Visibility filter',
     noteContent: 'Note content',
+    sessionDesk: 'Session Desk',
+    sessionDeskHint: 'Run tonight from the notes that matter now.',
+    quickCapture: 'Quick Capture',
+    quickCapturePlaceholder: 'NPC, clue, ruling, location, open question...',
+    capture: 'Capture',
+    tableReady: 'Table ready',
+    gmOnly: 'GM only',
+    secrets: 'Secrets',
+    openThreads: 'Open threads',
+    recentNotes: 'Recent',
+    activeNote: 'Active note',
+    details: 'Details',
+    showNotes: 'Notes',
+    showSession: 'Session',
+    showEditor: 'Editor',
+    showDetails: 'Details',
+    noDeskItems: 'Nothing here yet',
+    captureEmpty: 'Write something to capture first',
     importInvalid: 'Import canceled or invalid',
     workspaceImported: 'Workspace imported',
     importFailed: 'Import failed',
@@ -209,6 +245,24 @@ export const COPY: Record<Locale, NoteCopy> = {
     tagFilter: 'Tag-Filter',
     visibilityFilter: 'Sichtbarkeits-Filter',
     noteContent: 'Notizinhalt',
+    sessionDesk: 'Session Desk',
+    sessionDeskHint: 'Alles Wichtige für die laufende Runde.',
+    quickCapture: 'Schnellerfassung',
+    quickCapturePlaceholder: 'NSC, Hinweis, Regelung, Ort, offene Frage...',
+    capture: 'Erfassen',
+    tableReady: 'Tischbereit',
+    gmOnly: 'Nur SL',
+    secrets: 'Geheimnisse',
+    openThreads: 'Offene Fäden',
+    recentNotes: 'Zuletzt',
+    activeNote: 'Aktive Notiz',
+    details: 'Details',
+    showNotes: 'Notizen',
+    showSession: 'Runde',
+    showEditor: 'Editor',
+    showDetails: 'Details',
+    noDeskItems: 'Noch nichts vorhanden',
+    captureEmpty: 'Erst etwas für die Erfassung schreiben',
     importInvalid: 'Import abgebrochen oder ungültig',
     workspaceImported: 'Workspace importiert',
     importFailed: 'Import fehlgeschlagen',

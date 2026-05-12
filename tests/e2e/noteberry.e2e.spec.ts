@@ -11,11 +11,13 @@ test.describe('NoteBerry Electron QA', () => {
       await switchToEnglish(page)
       await expect(page.locator('.brand span')).toHaveText('Fast D&D notes for prep and play')
       await expect(page.getByRole('heading', { name: 'Notes' })).toBeVisible()
-      await expect(page.getByText('Session 7: Clocktower')).toBeVisible()
+      await expect(page.locator('.note-card', { hasText: 'Session 7: Clocktower' })).toBeVisible()
+      await expect(page.getByRole('heading', { name: 'Session Desk' })).toBeVisible()
+      await expect(page.getByRole('heading', { name: 'Quick Capture' })).toBeVisible()
       await expect(page.getByRole('heading', { name: 'Raw note' })).toBeVisible()
       await expect(page.getByRole('heading', { name: 'Field cards' })).toBeVisible()
       await expect(page.locator('.field-card')).toContainText('Secret')
-      await expect(page.locator('.mini-list').first()).toContainText('Archivist Nara')
+      await expect(page.locator('.desk-card', { hasText: 'Secrets' })).toContainText('Archivist Nara')
       await expect.poll(() => page.locator('.brand img').evaluate((img) => (img as HTMLImageElement).naturalWidth)).toBeGreaterThan(0)
       await assertVisibleLayout(page)
       await assertNoUnexpectedOverlaps(page)
@@ -57,7 +59,7 @@ test.describe('NoteBerry Electron QA', () => {
     }
   })
 
-  test('searches, filters categories and tags, and follows backlinks', async ({}, testInfo) => {
+  test('searches, filters categories, tags, and visibility without losing session context', async ({}, testInfo) => {
     const { app, page } = await launchNoteBerry(testInfo)
     try {
       await switchToEnglish(page)
@@ -69,10 +71,11 @@ test.describe('NoteBerry Electron QA', () => {
       await page.getByLabel('Tag filter').selectOption('npc')
       await expect(page.locator('.note-card')).toHaveCount(1)
       await page.locator('.note-card', { hasText: 'Archivist Nara' }).click()
-      await expect(page.locator('.mini-list').last()).toContainText('Session 7: Clocktower')
+      await expect(page.locator('.meta-strip select').nth(1)).toHaveValue('secret')
 
       await page.getByLabel('Search notes').fill('')
       await page.getByLabel('Category filter').selectOption('__all__')
+      await page.getByLabel('Visibility filter').selectOption('__all__')
       await page.getByLabel('Tag filter').selectOption('clocktower')
       await expect(page.locator('.note-card')).toHaveCount(2)
       await page.locator('.tag-cloud').getByRole('button', { name: 'npc' }).click()
@@ -262,6 +265,7 @@ async function assertVisibleLayout(page: import('@playwright/test').Page): Promi
         seen.add(element)
         const style = window.getComputedStyle(element)
         if (style.display === 'none' || style.visibility === 'hidden') continue
+        if (hasHiddenAncestor(element)) continue
         const rect = element.getBoundingClientRect()
         if (rect.width <= 0 || rect.height <= 0) result.push(`${selector} has empty bounds`)
         if (rect.left < -1 || rect.right > viewport.width + 1) result.push(`${selector} overflows horizontally`)
@@ -271,6 +275,14 @@ async function assertVisibleLayout(page: import('@playwright/test').Page): Promi
           if (clippedBy) result.push(`${selector} is clipped by ${clippedBy}: ${element.textContent?.trim().slice(0, 40)}`)
         }
       }
+    }
+
+    function hasHiddenAncestor(element: Element): boolean {
+      for (let parent = element.parentElement; parent && parent !== document.body; parent = parent.parentElement) {
+        const style = window.getComputedStyle(parent)
+        if (style.display === 'none' || style.visibility === 'hidden') return true
+      }
+      return false
     }
 
     function clippedByHiddenAncestor(element: Element, elementRect: DOMRect): string | null {
