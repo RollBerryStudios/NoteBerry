@@ -1,6 +1,6 @@
 {
   "name": "noteberry",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "NoteBerry - rich local note taking for virtual tabletop rounds",
   "main": "dist/main/main.js",
   "homepage": ".",
