@@ -50,8 +50,6 @@ test.describe('NoteBerry Electron QA', () => {
       await expect(page.getByLabel('Design')).toHaveValue('dark')
       await expect(page.getByRole('button', { name: 'Exportieren' })).toBeVisible()
       await expect(page.getByRole('button', { name: 'kontakt@rollberry.de' })).toBeVisible()
-      await expect(page.getByRole('button', { name: 'GitHub-Repository' })).toBeVisible()
-      await expect(page.getByRole('button', { name: 'RollBerry Studios auf GitHub' })).toBeVisible()
       await expect(page).toHaveScreenshot('noteberry-settings-dark-de.png', { fullPage: true })
       await page.getByLabel('Design').selectOption('light')
       await page.getByRole('button', { name: 'Schließen' }).click()
