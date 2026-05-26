@@ -7,8 +7,7 @@ type Theme = 'dark' | 'light'
 type MobileMode = 'notes' | 'session' | 'editor'
 type EditorMode = 'view' | 'edit'
 
-const GITHUB_URL = 'https://github.com/RollBerryStudios/NoteBerry'
-const ROLLBERRY_URL = 'https://github.com/RollBerryStudios'
+const ROLLBERRY_URL = 'https://rollberry.de'
 const CONTACT_EMAIL = 'kontakt@rollberry.de'
 const CONTACT_URL = `mailto:${CONTACT_EMAIL}`
 const RENDERER_PLATFORM = getRendererPlatform()
@@ -527,8 +526,7 @@ export default function App() {
                 <h3>{c.community}</h3>
                 <p>{c.rollberryInfo}</p>
                 <button onClick={() => window.noteberry.openExternal(CONTACT_URL)}>{CONTACT_EMAIL}</button>
-                <button onClick={() => window.noteberry.openExternal(GITHUB_URL)}>{c.githubRepo}</button>
-                <button onClick={() => window.noteberry.openExternal(ROLLBERRY_URL)}>{c.rollberryGithub}</button>
+                <button onClick={() => window.noteberry.openExternal(ROLLBERRY_URL)}>{c.rollberryWebsite}</button>
               </section>
             </div>
           </section>

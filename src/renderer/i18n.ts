@@ -24,10 +24,9 @@ export type NoteCopy = {
   darkMode: string
   lightMode: string
   community: string
-  githubRepo: string
   rollberryTitle: string
   rollberryInfo: string
-  rollberryGithub: string
+  rollberryWebsite: string
   close: string
   tagline: string
   export: string
@@ -101,10 +100,9 @@ export const COPY: Record<Locale, NoteCopy> = {
     darkMode: 'Dark',
     lightMode: 'Light',
     community: 'Community',
-    githubRepo: 'GitHub repository',
     rollberryTitle: 'RollBerry Studios',
     rollberryInfo: 'Local-first tabletop tools for game masters and players.',
-    rollberryGithub: 'RollBerry Studios on GitHub',
+    rollberryWebsite: 'rollberry.de',
     close: 'Close',
     tagline: 'Fast D&D notes for prep and play',
     export: 'Export',
@@ -176,10 +174,9 @@ export const COPY: Record<Locale, NoteCopy> = {
     darkMode: 'Dunkel',
     lightMode: 'Hell',
     community: 'Community',
-    githubRepo: 'GitHub-Repository',
     rollberryTitle: 'RollBerry Studios',
     rollberryInfo: 'Lokale Tabletop-Tools für Spielleitungen und Spieler.',
-    rollberryGithub: 'RollBerry Studios auf GitHub',
+    rollberryWebsite: 'rollberry.de',
     close: 'Schließen',
     tagline: 'Schnelle D&D-Notizen für Vorbereitung und Spiel',
     export: 'Exportieren',
