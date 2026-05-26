@@ -11,7 +11,7 @@
 
 <p align="center">
   <img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-yellow.svg">
-  <img alt="Version" src="https://img.shields.io/badge/version-0.1.10-blue.svg">
+  <img alt="Version" src="https://img.shields.io/badge/version-0.1.13-blue.svg">
   <img alt="Electron" src="https://img.shields.io/badge/Electron-41-47848F?logo=electron&logoColor=white">
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white">
   <img alt="React" src="https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white">
@@ -38,25 +38,25 @@ organisieren wollen.
 - **Schnellerfassung** - Einfälle, Hinweise und neue NSCs ohne Kontextwechsel aufnehmen
 - **Markdown-Vorschau** - schnelle Struktur für Vorbereitung und Spieltisch
 - **Mehrsprachig** - Benutzeroberfläche auf Deutsch und Englisch
-- **Einheitliche Navigation** - kompakte BoltBerry-App-Chrome mit Wordmark, Notiz-Breadcrumb und Einstellungen in der Titelleiste
+- **Einheitliche Navigation** - kompakte BoltBerry-App-Chrome mit Wordmark, Notiz-Breadcrumb und separater Aktionsleiste
 
 Gebaut mit Electron, React, TypeScript und Vite. Läuft auf macOS, Windows und
 Linux.
 
 ### Aktueller Release
 
-Aktuelle Version: **0.1.10**
+Aktuelle Version: **0.1.13**
 
 - [Neueste Release herunterladen](https://github.com/RollBerryStudios/NoteBerry/releases/latest)
 - [Alle Releases anzeigen](https://github.com/RollBerryStudios/NoteBerry/releases)
-- Direkter Tag: [v0.1.10](https://github.com/RollBerryStudios/NoteBerry/releases/tag/v0.1.10)
+- Direkter Tag: [v0.1.13](https://github.com/RollBerryStudios/NoteBerry/releases/tag/v0.1.13)
 
 | Plattform | Artefakt in der Release |
 |---|---|
-| Windows x64 | `NoteBerry.Setup.0.1.10.exe` |
-| Linux x64 | `NoteBerry-0.1.10.AppImage`, `noteberry_0.1.10_amd64.deb` |
-| macOS x64 | `NoteBerry-0.1.10.dmg`, `NoteBerry-0.1.10-mac.zip` |
-| macOS Apple Silicon | `NoteBerry-0.1.10-arm64.dmg`, `NoteBerry-0.1.10-arm64-mac.zip` |
+| Windows x64 | `NoteBerry.Setup.0.1.13.exe` |
+| Linux x64 | `NoteBerry-0.1.13.AppImage`, `noteberry_0.1.13_amd64.deb` |
+| macOS x64 | `NoteBerry-0.1.13.dmg`, `NoteBerry-0.1.13-mac.zip` |
+| macOS Apple Silicon | `NoteBerry-0.1.13-arm64.dmg`, `NoteBerry-0.1.13-arm64-mac.zip` |
 
 ### Features
 
@@ -73,6 +73,14 @@ Aktuelle Version: **0.1.10**
 | **Autosave** | Lokaler JSON-Arbeitsbereich mit Import/Export und Daten-Normalisierung |
 | **Responsive UI** | Desktop- und schmale Layouts per Playwright-Screenshots abgesichert |
 | **App-Chrome** | Kompakte BoltBerry-inspirierte Titelleiste mit einheitlicher Navigation und DPI-sicherem Fensterkontroll-Abstand |
+
+### Bedienung
+
+1. **Notizen organisieren** - erstelle Notizen nach Kategorie, Sichtbarkeit und Tags und finde sie über Suche oder Filter wieder.
+2. **Sitzung vorbereiten** - nutze Sitzungsübersicht und Schnellerfassung für tischbereite Handouts, SL-Notizen, Geheimnisse und offene Fäden.
+3. **Inhalte schreiben** - arbeite im Editor mit Markdown, Templates und Vorschau für NSCs, Orte, Aufträge, Regeln und Handouts.
+4. **Daten sichern** - exportiere den Arbeitsbereich, importiere bestehende JSON-Daten oder öffne den lokalen Datenordner.
+5. **Shortcuts nachschlagen** - öffne die Hilfe über den Info-Button, `?` oder `F1`; `Escape` schließt Hilfe, Einstellungen und Dialoge.
 
 ### Schnellstart
 
@@ -165,25 +173,25 @@ analog map, another VTT, or a lightweight online setup.
 - **Quick Capture** - capture ideas, clues, and new NPCs without losing context
 - **Markdown preview** - quick structure for prep and live play
 - **Multilingual** - English and German interface
-- **Unified navigation** - compact BoltBerry-style app chrome with wordmark, note breadcrumb, and settings in the title bar
+- **Unified navigation** - compact BoltBerry-style app chrome with wordmark, note breadcrumb, and separate action bar
 
 Built with Electron, React, TypeScript, and Vite. Runs on macOS, Windows, and
 Linux.
 
 ### Current Release
 
-Current version: **0.1.10**
+Current version: **0.1.13**
 
 - [Download the latest release](https://github.com/RollBerryStudios/NoteBerry/releases/latest)
 - [View all releases](https://github.com/RollBerryStudios/NoteBerry/releases)
-- Direct tag: [v0.1.10](https://github.com/RollBerryStudios/NoteBerry/releases/tag/v0.1.10)
+- Direct tag: [v0.1.13](https://github.com/RollBerryStudios/NoteBerry/releases/tag/v0.1.13)
 
 | Platform | Release artifact |
 |---|---|
-| Windows x64 | `NoteBerry.Setup.0.1.10.exe` |
-| Linux x64 | `NoteBerry-0.1.10.AppImage`, `noteberry_0.1.10_amd64.deb` |
-| macOS x64 | `NoteBerry-0.1.10.dmg`, `NoteBerry-0.1.10-mac.zip` |
-| macOS Apple Silicon | `NoteBerry-0.1.10-arm64.dmg`, `NoteBerry-0.1.10-arm64-mac.zip` |
+| Windows x64 | `NoteBerry.Setup.0.1.13.exe` |
+| Linux x64 | `NoteBerry-0.1.13.AppImage`, `noteberry_0.1.13_amd64.deb` |
+| macOS x64 | `NoteBerry-0.1.13.dmg`, `NoteBerry-0.1.13-mac.zip` |
+| macOS Apple Silicon | `NoteBerry-0.1.13-arm64.dmg`, `NoteBerry-0.1.13-arm64-mac.zip` |
 
 ### Features
 
@@ -200,6 +208,14 @@ Current version: **0.1.10**
 | **Autosave** | Local JSON workspace with import/export and data normalization |
 | **Responsive UI** | Desktop and narrow layouts covered by Playwright screenshots |
 | **App Chrome** | Compact BoltBerry-inspired title bar with unified navigation and DPI-safe native-control spacing |
+
+### Usage
+
+1. **Organize notes** - create notes by category, visibility, and tags, then find them through search or filters.
+2. **Prepare sessions** - use Session Desk and Quick Capture for table-ready handouts, GM notes, secrets, and open threads.
+3. **Write content** - work in the editor with Markdown, templates, and preview for NPCs, locations, quests, rules, and handouts.
+4. **Control your data** - export the workspace, import existing JSON data, or open the local data folder.
+5. **Check shortcuts** - open help with the info button, `?`, or `F1`; `Escape` closes help, settings, and dialogs.
 
 ### Getting Started
 
