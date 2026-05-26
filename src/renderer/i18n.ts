@@ -19,6 +19,7 @@ const CATEGORY_EMOJIS: Record<NoteCategory, string> = {
 export type NoteCopy = {
   language: string
   settings: string
+  helpTitle: string
   appearance: string
   theme: string
   darkMode: string
@@ -95,6 +96,7 @@ export const COPY: Record<Locale, NoteCopy> = {
   en: {
     language: 'Language',
     settings: 'Settings',
+    helpTitle: 'Help and shortcuts',
     appearance: 'Appearance',
     theme: 'Theme',
     darkMode: 'Dark',
@@ -169,6 +171,7 @@ export const COPY: Record<Locale, NoteCopy> = {
   de: {
     language: 'Sprache',
     settings: 'Einstellungen',
+    helpTitle: 'Hilfe und Tastaturkürzel',
     appearance: 'Darstellung',
     theme: 'Design',
     darkMode: 'Dunkel',

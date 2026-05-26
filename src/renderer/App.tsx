@@ -86,6 +86,7 @@ export default function App() {
   const [locale, setLocaleState] = useState<Locale>(() => localStorage.getItem('noteberry-locale') === 'en' ? 'en' : 'de')
   const [theme, setThemeState] = useState<Theme>(() => localStorage.getItem('noteberry-theme') === 'light' ? 'light' : 'dark')
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [helpOpen, setHelpOpen] = useState(false)
   const [templateOpen, setTemplateOpen] = useState(false)
   const [editorMode, setEditorMode] = useState<EditorMode>('view')
   const [draftCategory, setDraftCategory] = useState<NoteCategory>('Session')
@@ -261,8 +262,16 @@ export default function App() {
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
+        setHelpOpen(false)
         setTemplateOpen(false)
         setSettingsOpen(false)
+        return
+      }
+      const target = event.target as HTMLElement | null
+      if (target && (target.isContentEditable || ['INPUT', 'SELECT', 'TEXTAREA'].includes(target.tagName))) return
+      if (event.key === '?' || event.key === 'F1') {
+        event.preventDefault()
+        setHelpOpen((value) => !value)
       }
     }
     window.addEventListener('keydown', onKeyDown)
@@ -285,11 +294,15 @@ export default function App() {
           <strong>{activeNote.title}</strong>
         </div>
         <div className="spacer" />
-        <div className="titlebar-actions">
-          <button className="icon-button settings-trigger" aria-label={c.settings} title={c.settings} onClick={() => setSettingsOpen(true)}>⚙</button>
-        </div>
         {RENDERER_PLATFORM !== 'darwin' && <div className="titlebar-controls-space" aria-hidden="true" />}
       </header>
+
+      <div className="topbar">
+        <div className="titlebar-actions">
+          <button className="icon-button" aria-label={c.helpTitle} title={c.helpTitle} onClick={() => setHelpOpen(true)}>?</button>
+          <button className="icon-button settings-trigger" aria-label={c.settings} title={c.settings} onClick={() => setSettingsOpen(true)}>⚙</button>
+        </div>
+      </div>
 
       <nav className="mobile-mode-nav" aria-label="NoteBerry sections">
         {[
@@ -532,6 +545,7 @@ export default function App() {
           </section>
         </div>
       )}
+      {helpOpen && <HelpModal locale={locale} onClose={() => setHelpOpen(false)} />}
       {toast && <div className="toast">{toast}</div>}
     </div>
   )
@@ -542,6 +556,87 @@ function getRendererPlatform(): 'darwin' | 'win32' | 'linux' {
   if (platform.includes('mac')) return 'darwin'
   if (platform.includes('win')) return 'win32'
   return 'linux'
+}
+
+function HelpModal({ locale, onClose }: { locale: Locale; onClose: () => void }) {
+  const content = noteberryHelpContent(locale)
+  return (
+    <div className="modal-backdrop" onClick={onClose}>
+      <section className="help-modal" role="dialog" aria-modal="true" aria-label={content.title} onClick={(event) => event.stopPropagation()}>
+        <header>
+          <div>
+            <h2>{content.title}</h2>
+            <p>{content.subtitle}</p>
+          </div>
+          <button aria-label={content.close} onClick={onClose}>x</button>
+        </header>
+        <div className="help-modal-body">
+          {content.sections.map((section) => (
+            <section className="help-section" key={section.title}>
+              <h3>{section.title}</h3>
+              {section.text && <p>{section.text}</p>}
+              {section.items && <ul className="help-list">{section.items.map((item) => <li key={item}>{item}</li>)}</ul>}
+              {section.shortcuts && (
+                <div className="shortcut-list">
+                  {section.shortcuts.map((shortcut) => (
+                    <div className="shortcut-row" key={`${shortcut.keys}-${shortcut.label}`}>
+                      <kbd>{shortcut.keys}</kbd>
+                      <span>{shortcut.label}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </section>
+          ))}
+        </div>
+      </section>
+    </div>
+  )
+}
+
+type HelpContent = {
+  title: string
+  subtitle: string
+  close: string
+  sections: Array<{
+    title: string
+    text?: string
+    items?: string[]
+    shortcuts?: Array<{ keys: string; label: string }>
+  }>
+}
+
+function noteberryHelpContent(locale: Locale): HelpContent {
+  if (locale === 'en') {
+    return {
+      title: 'Help and shortcuts',
+      subtitle: 'A clear guide for notes, templates, session prep and table visibility.',
+      close: 'Close',
+      sections: [
+        { title: 'Notes list', items: ['Use search, categories and tags to keep campaign notes findable.', 'Pinned notes stay easy to spot when the session gets busy.', 'Each note has a status and visibility so draft, table and secret notes stay distinct.'] },
+        { title: 'Session desk', items: ['Use templates for common note types such as sessions, locations, NPCs and quests.', 'Quick notes are useful for ideas you want to capture without breaking flow.', 'Backlinks and wiki links help you see how notes connect.'] },
+        { title: 'Editor', items: ['Switch between editor and preview depending on whether you are writing or reading.', 'Use [[Name]] to create wiki-style links between notes.', 'Tags are comma-separated and make later filtering much faster.'] },
+        { title: 'Shortcuts', shortcuts: [
+          { keys: '? / F1', label: 'Open this overview' },
+          { keys: 'Escape', label: 'Close templates, settings or this overview' }
+        ] }
+      ]
+    }
+  }
+  return {
+    title: 'Hilfe und Tastaturkürzel',
+    subtitle: 'Eine klare Anleitung für Notizen, Vorlagen, Sitzungsvorbereitung und Sichtbarkeit am Tisch.',
+    close: 'Schließen',
+    sections: [
+      { title: 'Notizliste', items: ['Nutze Suche, Kategorien und Tags, damit Kampagnennotizen auffindbar bleiben.', 'Angepinnte Notizen bleiben sichtbar, wenn es in der Sitzung hektisch wird.', 'Status und Sichtbarkeit trennen Entwürfe, Tischinfos und geheime SL-Notizen.'] },
+      { title: 'Sitzungstisch', items: ['Vorlagen helfen bei häufigen Notiztypen wie Sitzungen, Orten, NSCs und Quests.', 'Schnellnotizen sind für Ideen gedacht, die du ohne Unterbrechung festhalten möchtest.', 'Backlinks und Wiki-Links zeigen dir, wie Notizen zusammenhängen.'] },
+      { title: 'Editor', items: ['Wechsle zwischen Editor und Vorschau, je nachdem ob du schreibst oder liest.', 'Mit [[Name]] legst du Wiki-artige Verknüpfungen zwischen Notizen an.', 'Tags werden durch Kommas getrennt und machen späteres Filtern deutlich schneller.'] },
+      { title: 'Tastaturkürzel', shortcuts: [
+        { keys: '? / F1', label: 'Diese Übersicht öffnen' },
+        { keys: 'Escape', label: 'Vorlagen, Einstellungen oder diese Übersicht schließen' }
+      ] }
+    ]
+  }
 }
 
 function SegmentedChoice<T extends string>({
