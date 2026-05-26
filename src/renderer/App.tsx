@@ -11,6 +11,7 @@ const GITHUB_URL = 'https://github.com/RollBerryStudios/NoteBerry'
 const ROLLBERRY_URL = 'https://github.com/RollBerryStudios'
 const CONTACT_EMAIL = 'kontakt@rollberry.de'
 const CONTACT_URL = `mailto:${CONTACT_EMAIL}`
+const RENDERER_PLATFORM = getRendererPlatform()
 
 function newId(): string {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`
@@ -272,18 +273,23 @@ export default function App() {
   if (!ready || !activeNote) return <div className="loading">Loading NoteBerry...</div>
 
   return (
-    <div className="app-shell" data-theme={theme}>
+    <div className="app-shell" data-theme={theme} data-platform={RENDERER_PLATFORM}>
       <header className="titlebar">
+        {RENDERER_PLATFORM === 'darwin' && <div className="titlebar-traffic-space" aria-hidden="true" />}
         <div className="brand">
           <img src={logoUrl} alt="" />
-          <div>
-            <strong>NoteBerry</strong>
-            <span>{c.tagline}</span>
-          </div>
+          <span className="wordmark">NOTE<span>BERRY</span></span>
         </div>
+        <div className="titlebar-breadcrumb" title={activeNote.title}>
+          <span>{c.notes}</span>
+          <span className="titlebar-breadcrumb-sep">/</span>
+          <strong>{activeNote.title}</strong>
+        </div>
+        <div className="spacer" />
         <div className="titlebar-actions">
           <button className="icon-button settings-trigger" aria-label={c.settings} title={c.settings} onClick={() => setSettingsOpen(true)}>⚙</button>
         </div>
+        {RENDERER_PLATFORM !== 'darwin' && <div className="titlebar-controls-space" aria-hidden="true" />}
       </header>
 
       <nav className="mobile-mode-nav" aria-label="NoteBerry sections">
@@ -356,7 +362,7 @@ export default function App() {
           </div>
         </aside>
 
-        <section className={`editor-panel ${mobileMode === 'session' || mobileMode === 'editor' || mobileMode === 'details' ? 'mobile-active' : ''}`}>
+        <section className={`editor-panel ${mobileMode === 'session' || mobileMode === 'editor' ? 'mobile-active' : ''}`}>
           <section className={`session-desk ${mobileMode === 'session' ? 'mobile-active' : ''}`}>
             <div className="desk-head">
               <div>
@@ -531,6 +537,13 @@ export default function App() {
       {toast && <div className="toast">{toast}</div>}
     </div>
   )
+}
+
+function getRendererPlatform(): 'darwin' | 'win32' | 'linux' {
+  const platform = navigator.platform.toLowerCase()
+  if (platform.includes('mac')) return 'darwin'
+  if (platform.includes('win')) return 'win32'
+  return 'linux'
 }
 
 function SegmentedChoice<T extends string>({

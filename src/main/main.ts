@@ -28,6 +28,7 @@ const isDev = process.env.NODE_ENV === 'development'
 const RENDERER_URL = 'http://localhost:5176'
 const APP_NAME = 'NoteBerry'
 const DATA_FILE = 'noteberry-workspace.json'
+const isDarwin = process.platform === 'darwin'
 
 app.setName(APP_NAME)
 if (process.env.NOTEBERRY_E2E_USER_DATA) {
@@ -230,6 +231,9 @@ function createWindow(): void {
     minHeight: 720,
     title: APP_NAME,
     backgroundColor: '#151713',
+    frame: false,
+    titleBarStyle: isDarwin ? 'hiddenInset' : 'hidden',
+    ...(isDarwin ? { trafficLightPosition: { x: 16, y: 10 } } : { titleBarOverlay: { color: '#14161b', symbolColor: '#3f9f6b', height: 36 } }),
     webPreferences: {
       preload: join(appRoot(), 'dist/preload/preload.js'),
       contextIsolation: true,
