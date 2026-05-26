@@ -11,7 +11,7 @@
 
 <p align="center">
   <img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-yellow.svg">
-  <img alt="Version" src="https://img.shields.io/badge/version-0.1.7-blue.svg">
+  <img alt="Version" src="https://img.shields.io/badge/version-0.1.9-blue.svg">
   <img alt="Electron" src="https://img.shields.io/badge/Electron-41-47848F?logo=electron&logoColor=white">
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white">
   <img alt="React" src="https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white">
@@ -38,24 +38,25 @@ organisieren wollen.
 - **Schnellerfassung** - Einfälle, Hinweise und neue NSCs ohne Kontextwechsel aufnehmen
 - **Markdown-Vorschau** - schnelle Struktur für Vorbereitung und Spieltisch
 - **Mehrsprachig** - Benutzeroberfläche auf Deutsch und Englisch
+- **Einheitliche Navigation** - kompakte BoltBerry-App-Chrome mit Wordmark, Notiz-Breadcrumb und Einstellungen in der Titelleiste
 
 Gebaut mit Electron, React, TypeScript und Vite. Läuft auf macOS, Windows und
 Linux.
 
 ### Aktueller Release
 
-Aktuelle Version: **0.1.7**
+Aktuelle Version: **0.1.9**
 
 - [Neueste Release herunterladen](https://github.com/RollBerryStudios/NoteBerry/releases/latest)
 - [Alle Releases anzeigen](https://github.com/RollBerryStudios/NoteBerry/releases)
-- Direkter Tag: [v0.1.7](https://github.com/RollBerryStudios/NoteBerry/releases/tag/v0.1.7)
+- Direkter Tag: [v0.1.9](https://github.com/RollBerryStudios/NoteBerry/releases/tag/v0.1.9)
 
 | Plattform | Artefakt in der Release |
 |---|---|
-| Windows x64 | `NoteBerry.Setup.0.1.7.exe` |
-| Linux x64 | `NoteBerry-0.1.7.AppImage`, `noteberry_0.1.7_amd64.deb` |
-| macOS x64 | `NoteBerry-0.1.7.dmg`, `NoteBerry-0.1.7-mac.zip` |
-| macOS Apple Silicon | `NoteBerry-0.1.7-arm64.dmg`, `NoteBerry-0.1.7-arm64-mac.zip` |
+| Windows x64 | `NoteBerry.Setup.0.1.9.exe` |
+| Linux x64 | `NoteBerry-0.1.9.AppImage`, `noteberry_0.1.9_amd64.deb` |
+| macOS x64 | `NoteBerry-0.1.9.dmg`, `NoteBerry-0.1.9-mac.zip` |
+| macOS Apple Silicon | `NoteBerry-0.1.9-arm64.dmg`, `NoteBerry-0.1.9-arm64-mac.zip` |
 
 ### Features
 
@@ -71,6 +72,7 @@ Aktuelle Version: **0.1.7**
 | **Markdown-Vorschau** | Überschriften, Listen, Betonung und Code für lesbare Vorbereitung |
 | **Autosave** | Lokaler JSON-Arbeitsbereich mit Import/Export und Daten-Normalisierung |
 | **Responsive UI** | Desktop- und schmale Layouts per Playwright-Screenshots abgesichert |
+| **App-Chrome** | Kompakte BoltBerry-inspirierte Titelleiste mit einheitlicher Navigation und DPI-sicherem Fensterkontroll-Abstand |
 
 ### Schnellstart
 
@@ -163,24 +165,25 @@ analog map, another VTT, or a lightweight online setup.
 - **Quick Capture** - capture ideas, clues, and new NPCs without losing context
 - **Markdown preview** - quick structure for prep and live play
 - **Multilingual** - English and German interface
+- **Unified navigation** - compact BoltBerry-style app chrome with wordmark, note breadcrumb, and settings in the title bar
 
 Built with Electron, React, TypeScript, and Vite. Runs on macOS, Windows, and
 Linux.
 
 ### Current Release
 
-Current version: **0.1.7**
+Current version: **0.1.9**
 
 - [Download the latest release](https://github.com/RollBerryStudios/NoteBerry/releases/latest)
 - [View all releases](https://github.com/RollBerryStudios/NoteBerry/releases)
-- Direct tag: [v0.1.7](https://github.com/RollBerryStudios/NoteBerry/releases/tag/v0.1.7)
+- Direct tag: [v0.1.9](https://github.com/RollBerryStudios/NoteBerry/releases/tag/v0.1.9)
 
 | Platform | Release artifact |
 |---|---|
-| Windows x64 | `NoteBerry.Setup.0.1.7.exe` |
-| Linux x64 | `NoteBerry-0.1.7.AppImage`, `noteberry_0.1.7_amd64.deb` |
-| macOS x64 | `NoteBerry-0.1.7.dmg`, `NoteBerry-0.1.7-mac.zip` |
-| macOS Apple Silicon | `NoteBerry-0.1.7-arm64.dmg`, `NoteBerry-0.1.7-arm64-mac.zip` |
+| Windows x64 | `NoteBerry.Setup.0.1.9.exe` |
+| Linux x64 | `NoteBerry-0.1.9.AppImage`, `noteberry_0.1.9_amd64.deb` |
+| macOS x64 | `NoteBerry-0.1.9.dmg`, `NoteBerry-0.1.9-mac.zip` |
+| macOS Apple Silicon | `NoteBerry-0.1.9-arm64.dmg`, `NoteBerry-0.1.9-arm64-mac.zip` |
 
 ### Features
 
@@ -196,6 +199,7 @@ Current version: **0.1.7**
 | **Markdown Preview** | Headings, lists, emphasis, and code for readable prep |
 | **Autosave** | Local JSON workspace with import/export and data normalization |
 | **Responsive UI** | Desktop and narrow layouts covered by Playwright screenshots |
+| **App Chrome** | Compact BoltBerry-inspired title bar with unified navigation and DPI-safe native-control spacing |
 
 ### Getting Started
 
