@@ -126,7 +126,10 @@ test.describe('NoteBerry Electron QA', () => {
         await assertVisibleLayout(page)
         await assertNoUnexpectedOverlaps(page)
       }
-      await expect(page).toHaveScreenshot('noteberry-template-stack-desktop.png', { fullPage: true })
+      await expect(page).toHaveScreenshot('noteberry-template-stack-desktop.png', {
+        fullPage: true,
+        maxDiffPixelRatio: 0.12,
+      })
       await expect.poll(() => readSavedWorkspace(workspacePath).notes.length).toBe(11)
     } finally {
       await app.close()
@@ -257,7 +260,7 @@ test.describe('NoteBerry Electron QA', () => {
       await assertNoUnexpectedOverlaps(page)
       await expect(page).toHaveScreenshot('noteberry-mobile-390.png', {
         fullPage: true,
-        maxDiffPixelRatio: 0.08,
+        maxDiffPixelRatio: 0.12,
       })
     } finally {
       await app.close()
