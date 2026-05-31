@@ -1,12 +1,12 @@
-appId: com.rollberrystudios.noteberry
-productName: NoteBerry
+appId: com.rollberrystudios.questberry
+productName: QuestBerry
 copyright: Copyright © 2026 RollBerry Studios
 
 extraMetadata:
   main: dist/main/main.js
-  name: noteberry
-  productName: NoteBerry
-  description: Rich local note taking for virtual tabletop rounds
+  name: questberry
+  productName: QuestBerry
+  description: Local-first campaign companion for tabletop RPG sessions
 
 directories:
   output: release
@@ -33,7 +33,7 @@ win:
 nsis:
   oneClick: false
   allowToChangeInstallationDirectory: true
-  shortcutName: NoteBerry
+  shortcutName: QuestBerry
   runAfterFinish: true
 
 mac:
@@ -56,4 +56,4 @@ linux:
       arch: [x64]
   icon: resources/icon.png
   category: Office
-  description: Rich local note taking for virtual tabletop rounds
+  description: Local-first campaign companion for tabletop RPG sessions

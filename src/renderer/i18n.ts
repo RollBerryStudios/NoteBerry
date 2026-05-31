@@ -165,7 +165,7 @@ export const COPY: Record<Locale, NoteCopy> = {
     workspaceImported: 'Workspace imported',
     importFailed: 'Import failed',
     deleteConfirm: (title) => `Delete "${title}"?`,
-    deleteDetail: 'This removes the note from the local NoteBerry workspace.',
+    deleteDetail: 'This removes the note from the local QuestBerry workspace.',
     newTitle: (category) => `New ${category}`,
   },
   de: {
@@ -240,7 +240,7 @@ export const COPY: Record<Locale, NoteCopy> = {
     workspaceImported: 'Arbeitsbereich importiert',
     importFailed: 'Import fehlgeschlagen',
     deleteConfirm: (title) => `"${title}" löschen?`,
-    deleteDetail: 'Diese Notiz wird aus dem lokalen NoteBerry-Arbeitsbereich entfernt.',
+    deleteDetail: 'Diese Notiz wird aus dem lokalen QuestBerry-Arbeitsbereich entfernt.',
     newTitle: (category) => `Neue Notiz: ${categoryLabel('de', category)}`,
   },
 }

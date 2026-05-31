@@ -1,8 +1,8 @@
-# NoteBerry Testing Process
+# QuestBerry Testing Process
 
 ## Current Coverage
 
-The Playwright Electron suite covers the first production slice of NoteBerry:
+The Playwright Electron suite covers the first production slice of QuestBerry:
 
 - first render, title, logo, note list, editor, preview, and table intel
 - transparent logo rendering in the app chrome
@@ -14,7 +14,7 @@ The Playwright Electron suite covers the first production slice of NoteBerry:
 - markdown preview for headings, bullets, emphasis, code, and wiki links
 - TODO counting, wiki link listing, and backlink navigation
 - tag-chip filter interactions
-- autosave persistence into `data/noteberry-workspace.json`
+- autosave persistence into `data/questberry-workspace.json`
 - damaged local data normalization
 - desktop and narrow viewport screenshot baselines
 - desktop, state-ordering, markdown-edited, template-stack, and responsive editor screenshots
@@ -39,7 +39,7 @@ npm run pack
 Stored under:
 
 ```text
-tests/e2e/noteberry.e2e.spec.ts-snapshots/
+tests/e2e/questberry.e2e.spec.ts-snapshots/
 ```
 
 Update them intentionally after reviewed UI changes:

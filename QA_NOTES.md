@@ -1,4 +1,4 @@
-# NoteBerry QA Notes
+# QuestBerry QA Notes
 
 Status legend: `[x] done`, `[~] partial`, `[ ] missing`.
 

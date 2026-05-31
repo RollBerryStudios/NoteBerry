@@ -1,6 +1,6 @@
 import { app, BrowserWindow, dialog, ipcMain, shell, session, type IpcMainInvokeEvent, type MessageBoxOptions, type OpenDialogOptions } from 'electron'
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs'
-import { join, resolve } from 'path'
+import { dirname, join, resolve } from 'path'
 
 type NoteStatus = 'draft' | 'active' | 'resolved' | 'archived'
 type NoteVisibility = 'gm' | 'table' | 'secret'
@@ -26,13 +26,15 @@ interface NoteWorkspace {
 
 const isDev = process.env.NODE_ENV === 'development'
 const RENDERER_URL = 'http://localhost:5176'
-const APP_NAME = 'NoteBerry'
-const DATA_FILE = 'noteberry-workspace.json'
+const APP_NAME = 'QuestBerry'
+const DATA_FILE = 'questberry-workspace.json'
+const LEGACY_APP_NAME = 'NoteBerry'
+const LEGACY_DATA_FILE = 'noteberry-workspace.json'
 const isDarwin = process.platform === 'darwin'
 
 app.setName(APP_NAME)
-if (process.env.NOTEBERRY_E2E_USER_DATA) {
-  app.setPath('userData', resolve(process.env.NOTEBERRY_E2E_USER_DATA))
+if (process.env.QUESTBERRY_E2E_USER_DATA) {
+  app.setPath('userData', resolve(process.env.QUESTBERRY_E2E_USER_DATA))
 }
 
 let mainWindow: BrowserWindow | null = null
@@ -55,6 +57,13 @@ function workspacePath(): string {
   const dir = join(userDataPath(), 'data')
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true })
   return join(dir, DATA_FILE)
+}
+
+function legacyWorkspacePaths(): string[] {
+  return [
+    join(userDataPath(), 'data', LEGACY_DATA_FILE),
+    join(dirname(userDataPath()), LEGACY_APP_NAME, 'data', LEGACY_DATA_FILE),
+  ]
 }
 
 function text(value: unknown, fallback = ''): string {
@@ -125,9 +134,10 @@ function normalizeWorkspace(value: unknown): NoteWorkspace {
 
 function loadWorkspace(): NoteWorkspace {
   const path = workspacePath()
-  if (!existsSync(path)) return defaultWorkspace()
+  const sourcePath = existsSync(path) ? path : legacyWorkspacePaths().find((legacyPath) => existsSync(legacyPath))
+  if (!sourcePath) return defaultWorkspace()
   try {
-    const normalized = normalizeWorkspace(JSON.parse(readFileSync(path, 'utf8')))
+    const normalized = normalizeWorkspace(JSON.parse(readFileSync(sourcePath, 'utf8')))
     writeFileSync(path, JSON.stringify(normalized, null, 2), 'utf8')
     return normalized
   } catch {
@@ -168,9 +178,9 @@ function registerIpc(): void {
   })
   ipcMain.handle('noteberry:workspace-export', async (event, workspace: NoteWorkspace) => {
     const options = {
-      title: 'Export NoteBerry workspace',
-      defaultPath: 'noteberry-workspace.json',
-      filters: [{ name: 'NoteBerry Workspace', extensions: ['json'] }],
+      title: 'Export QuestBerry workspace',
+      defaultPath: 'questberry-workspace.json',
+      filters: [{ name: 'QuestBerry Workspace', extensions: ['json'] }],
     }
     const owner = ownerWindow(event)
     const result = owner ? await dialog.showSaveDialog(owner, options) : await dialog.showSaveDialog(options)
@@ -180,9 +190,9 @@ function registerIpc(): void {
   })
   ipcMain.handle('noteberry:workspace-import', async (event) => {
     const options = {
-      title: 'Import NoteBerry workspace',
+      title: 'Import QuestBerry workspace',
       properties: ['openFile'],
-      filters: [{ name: 'NoteBerry Workspaces', extensions: ['json'] }],
+      filters: [{ name: 'QuestBerry Workspaces', extensions: ['json'] }],
     } as OpenDialogOptions
     const owner = ownerWindow(event)
     const result = owner ? await dialog.showOpenDialog(owner, options) : await dialog.showOpenDialog(options)

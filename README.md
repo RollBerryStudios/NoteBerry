@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="resources/logo.png" alt="NoteBerry Logo" width="220">
+  <img src="resources/logo.png" alt="QuestBerry Logo" width="220">
 </p>
 
-<h1 align="center">NoteBerry</h1>
+<h1 align="center">QuestBerry</h1>
 
 <p align="center">
   <strong>Lokale Kampagnen-Notizen für Pen-&amp;-Paper-Runden</strong><br>
@@ -26,7 +26,7 @@
 
 ## Deutsch
 
-NoteBerry ist eine **kostenlose, lokale Desktop-App für Kampagnen-Notizen,
+QuestBerry ist eine **kostenlose, lokale Desktop-App für Kampagnen-Notizen,
 Vorbereitung und Spielleitung**. Sie ist für Gruppen gedacht, die ihre Notizen
 neben einer analogen Karte, einem anderen VTT oder einem leichten Online-Setup
 organisieren wollen.
@@ -47,16 +47,16 @@ Linux.
 
 Aktuelle Version: **0.1.13**
 
-- [Neueste Release herunterladen](https://github.com/RollBerryStudios/NoteBerry/releases/latest)
-- [Alle Releases anzeigen](https://github.com/RollBerryStudios/NoteBerry/releases)
-- Direkter Tag: [v0.1.13](https://github.com/RollBerryStudios/NoteBerry/releases/tag/v0.1.13)
+- [Neueste Release herunterladen](https://github.com/RollBerryStudios/QuestBerry/releases/latest)
+- [Alle Releases anzeigen](https://github.com/RollBerryStudios/QuestBerry/releases)
+- Direkter Tag: [v0.1.13](https://github.com/RollBerryStudios/QuestBerry/releases/tag/v0.1.13)
 
 | Plattform | Artefakt in der Release |
 |---|---|
-| Windows x64 | `NoteBerry.Setup.0.1.13.exe` |
-| Linux x64 | `NoteBerry-0.1.13.AppImage`, `noteberry_0.1.13_amd64.deb` |
-| macOS x64 | `NoteBerry-0.1.13.dmg`, `NoteBerry-0.1.13-mac.zip` |
-| macOS Apple Silicon | `NoteBerry-0.1.13-arm64.dmg`, `NoteBerry-0.1.13-arm64-mac.zip` |
+| Windows x64 | `QuestBerry.Setup.0.1.13.exe` |
+| Linux x64 | `QuestBerry-0.1.13.AppImage`, `questberry_0.1.13_amd64.deb` |
+| macOS x64 | `QuestBerry-0.1.13.dmg`, `QuestBerry-0.1.13-mac.zip` |
+| macOS Apple Silicon | `QuestBerry-0.1.13-arm64.dmg`, `QuestBerry-0.1.13-arm64-mac.zip` |
 
 ### Features
 
@@ -87,8 +87,8 @@ Aktuelle Version: **0.1.13**
 **Voraussetzungen:** Node.js 20+ und npm 10+
 
 ```bash
-git clone https://github.com/RollBerryStudios/NoteBerry.git
-cd NoteBerry
+git clone https://github.com/RollBerryStudios/QuestBerry.git
+cd QuestBerry
 npm install
 npm run dev
 ```
@@ -109,17 +109,17 @@ npm run test:e2e:headed   # Gleiche Suite mit sichtbarem Fenster
 npm run test:e2e:update   # Screenshot-Baselines nach absichtlichen UI-Änderungen aktualisieren
 ```
 
-Die E2E-Suite startet NoteBerry mit isolierten Testdaten und prüft Rendering,
+Die E2E-Suite startet QuestBerry mit isolierten Testdaten und prüft Rendering,
 Suche, Kategorie-/Tag-/Sichtbarkeitsfilter, Templates, Markdown-Vorschau,
 Sitzungsübersicht, Schnellerfassung, Persistenz, Normalisierung beschädigter Daten sowie Desktop- und
 Responsive-Screenshots ohne Überlappungen.
 
 ### Lokale Daten
 
-NoteBerry speichert lokal im Electron-AppData-Verzeichnis:
+QuestBerry speichert lokal im Electron-AppData-Verzeichnis:
 
 ```text
-data/noteberry-workspace.json
+data/questberry-workspace.json
 ```
 
 Der Arbeitsbereich wird beim Laden normalisiert, damit beschädigte oder veraltete
@@ -149,7 +149,7 @@ resources/       Logo und App-Icons
 
 ### CI/CD & Releases
 
-Fertige Builds werden als [GitHub Releases](https://github.com/RollBerryStudios/NoteBerry/releases)
+Fertige Builds werden als [GitHub Releases](https://github.com/RollBerryStudios/QuestBerry/releases)
 veröffentlicht. Die Release-Seite enthält Windows-, Linux- und macOS-Artefakte.
 Lokale Builds sind unsigned; notarized macOS-Releases oder signierte
 Windows-Installer brauchen eigene Zertifikate und Secrets.
@@ -162,7 +162,7 @@ App-Code: [MIT](LICENSE) (c) 2026 RollBerry Studios.
 
 ## English
 
-NoteBerry is a **free, local-first desktop app for campaign notes, prep, and
+QuestBerry is a **free, local-first desktop app for campaign notes, prep, and
 table management**. It is built for groups that want focused notes beside an
 analog map, another VTT, or a lightweight online setup.
 
@@ -182,16 +182,16 @@ Linux.
 
 Current version: **0.1.13**
 
-- [Download the latest release](https://github.com/RollBerryStudios/NoteBerry/releases/latest)
-- [View all releases](https://github.com/RollBerryStudios/NoteBerry/releases)
-- Direct tag: [v0.1.13](https://github.com/RollBerryStudios/NoteBerry/releases/tag/v0.1.13)
+- [Download the latest release](https://github.com/RollBerryStudios/QuestBerry/releases/latest)
+- [View all releases](https://github.com/RollBerryStudios/QuestBerry/releases)
+- Direct tag: [v0.1.13](https://github.com/RollBerryStudios/QuestBerry/releases/tag/v0.1.13)
 
 | Platform | Release artifact |
 |---|---|
-| Windows x64 | `NoteBerry.Setup.0.1.13.exe` |
-| Linux x64 | `NoteBerry-0.1.13.AppImage`, `noteberry_0.1.13_amd64.deb` |
-| macOS x64 | `NoteBerry-0.1.13.dmg`, `NoteBerry-0.1.13-mac.zip` |
-| macOS Apple Silicon | `NoteBerry-0.1.13-arm64.dmg`, `NoteBerry-0.1.13-arm64-mac.zip` |
+| Windows x64 | `QuestBerry.Setup.0.1.13.exe` |
+| Linux x64 | `QuestBerry-0.1.13.AppImage`, `questberry_0.1.13_amd64.deb` |
+| macOS x64 | `QuestBerry-0.1.13.dmg`, `QuestBerry-0.1.13-mac.zip` |
+| macOS Apple Silicon | `QuestBerry-0.1.13-arm64.dmg`, `QuestBerry-0.1.13-arm64-mac.zip` |
 
 ### Features
 
@@ -222,8 +222,8 @@ Current version: **0.1.13**
 **Prerequisites:** Node.js 20+ and npm 10+
 
 ```bash
-git clone https://github.com/RollBerryStudios/NoteBerry.git
-cd NoteBerry
+git clone https://github.com/RollBerryStudios/QuestBerry.git
+cd QuestBerry
 npm install
 npm run dev
 ```
@@ -244,17 +244,17 @@ npm run test:e2e:headed   # Same suite with a visible window
 npm run test:e2e:update   # Refresh screenshot baselines after intentional UI changes
 ```
 
-The E2E suite launches NoteBerry with isolated test data and validates
+The E2E suite launches QuestBerry with isolated test data and validates
 rendering, search, category/tag/visibility filters, templates, markdown
 preview, Session Desk, Quick Capture, persistence, damaged data normalization, and
 desktop/responsive screenshots without layout overlaps.
 
 ### Local Data
 
-NoteBerry stores its local data in the Electron app data folder:
+QuestBerry stores its local data in the Electron app data folder:
 
 ```text
-data/noteberry-workspace.json
+data/questberry-workspace.json
 ```
 
 The workspace is normalized on load so damaged or outdated data cannot break
@@ -284,7 +284,7 @@ resources/       Logo and app icons
 
 ### CI/CD & Releases
 
-Ready-to-use builds are published as [GitHub Releases](https://github.com/RollBerryStudios/NoteBerry/releases).
+Ready-to-use builds are published as [GitHub Releases](https://github.com/RollBerryStudios/QuestBerry/releases).
 The release page contains Windows, Linux, and macOS artifacts. Local builds are
 unsigned; notarized macOS releases or signed Windows installers require your
 own certificates and secrets.

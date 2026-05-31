@@ -1,7 +1,7 @@
 {
-  "name": "noteberry",
+  "name": "questberry",
   "version": "0.1.13",
-  "description": "NoteBerry - rich local note taking for virtual tabletop rounds",
+  "description": "QuestBerry - local-first campaign companion for tabletop RPG sessions",
   "main": "dist/main/main.js",
   "homepage": ".",
   "author": {

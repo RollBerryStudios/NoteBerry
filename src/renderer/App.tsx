@@ -83,8 +83,8 @@ export default function App() {
   const [quickCategory, setQuickCategory] = useState<NoteCategory>('Session')
   const [quickVisibility, setQuickVisibility] = useState<NoteVisibility>('gm')
   const [toast, setToast] = useState<string | null>(null)
-  const [locale, setLocaleState] = useState<Locale>(() => localStorage.getItem('noteberry-locale') === 'en' ? 'en' : 'de')
-  const [theme, setThemeState] = useState<Theme>(() => localStorage.getItem('noteberry-theme') === 'light' ? 'light' : 'dark')
+  const [locale, setLocaleState] = useState<Locale>(() => localStorage.getItem('questberry-locale') === 'en' ? 'en' : 'de')
+  const [theme, setThemeState] = useState<Theme>(() => localStorage.getItem('questberry-theme') === 'light' ? 'light' : 'dark')
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [helpOpen, setHelpOpen] = useState(false)
   const [templateOpen, setTemplateOpen] = useState(false)
@@ -99,12 +99,12 @@ export default function App() {
 
   function setLocale(next: Locale): void {
     setLocaleState(next)
-    localStorage.setItem('noteberry-locale', next)
+    localStorage.setItem('questberry-locale', next)
   }
 
   function setTheme(next: Theme): void {
     setThemeState(next)
-    localStorage.setItem('noteberry-theme', next)
+    localStorage.setItem('questberry-theme', next)
   }
 
   useEffect(() => {
@@ -278,7 +278,7 @@ export default function App() {
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [])
 
-  if (!ready || !activeNote) return <div className="loading">Loading NoteBerry...</div>
+  if (!ready || !activeNote) return <div className="loading">Loading QuestBerry...</div>
 
   return (
     <div className="app-shell" data-theme={theme} data-platform={RENDERER_PLATFORM}>
@@ -286,7 +286,7 @@ export default function App() {
         {RENDERER_PLATFORM === 'darwin' && <div className="titlebar-traffic-space" aria-hidden="true" />}
         <div className="brand">
           <img src={logoUrl} alt="" />
-          <span className="wordmark">NOTE<span>BERRY</span></span>
+          <span className="wordmark">QUEST<span>BERRY</span></span>
         </div>
         <div className="titlebar-breadcrumb" title={activeNote.title}>
           <span>{c.notes}</span>
@@ -304,7 +304,7 @@ export default function App() {
         </div>
       </div>
 
-      <nav className="mobile-mode-nav" aria-label="NoteBerry sections">
+      <nav className="mobile-mode-nav" aria-label="QuestBerry sections">
         {[
           { id: 'notes', label: c.showNotes },
           { id: 'session', label: c.showSession },

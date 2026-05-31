@@ -1,15 +1,15 @@
 import { expect, test } from '@playwright/test'
-import { launchNoteBerry, readSavedWorkspace, sampleWorkspace } from './helpers/noteberryApp'
+import { launchQuestBerry, readSavedWorkspace, sampleWorkspace } from './helpers/noteberryApp'
 
-test.describe('NoteBerry Electron QA', () => {
+test.describe('QuestBerry Electron QA', () => {
   test('renders the note workspace with a clean view/edit note workflow', async ({}, testInfo) => {
-    const { app, page } = await launchNoteBerry(testInfo)
+    const { app, page } = await launchQuestBerry(testInfo)
     try {
-      await expect(page).toHaveTitle('NoteBerry')
+      await expect(page).toHaveTitle('QuestBerry')
       await expect(page.locator('.brand img')).toBeVisible()
       await expect(page.getByRole('button', { name: 'Einstellungen' })).toBeVisible()
       await switchToEnglish(page)
-      await expect(page.locator('.wordmark')).toHaveText('NOTEBERRY')
+      await expect(page.locator('.wordmark')).toHaveText('QUESTBERRY')
       await expect(page.locator('.titlebar-breadcrumb')).toContainText('Session 7: Clocktower')
       await expect(page.getByRole('heading', { name: 'Notes' })).toBeVisible()
       await expect(page.locator('.note-card', { hasText: 'Session 7: Clocktower' })).toBeVisible()
@@ -32,7 +32,7 @@ test.describe('NoteBerry Electron QA', () => {
   })
 
   test('opens settings with German dark defaults and keeps German templates usable', async ({}, testInfo) => {
-      const { app, page } = await launchNoteBerry(testInfo)
+      const { app, page } = await launchQuestBerry(testInfo)
     try {
       await expect(page.getByRole('heading', { name: 'Notizen' })).toBeVisible()
       await expect(page.getByRole('heading', { name: 'Sitzungsübersicht' })).toBeVisible()
@@ -70,7 +70,7 @@ test.describe('NoteBerry Electron QA', () => {
   })
 
   test('searches, filters categories, tags, and visibility without losing session context', async ({}, testInfo) => {
-    const { app, page } = await launchNoteBerry(testInfo)
+    const { app, page } = await launchQuestBerry(testInfo)
     try {
       await switchToEnglish(page)
       await page.getByLabel('Search notes').fill('nara')
@@ -99,7 +99,7 @@ test.describe('NoteBerry Electron QA', () => {
   })
 
   test('creates each VTT template and validates default category, tags, and starter structure', async ({}, testInfo) => {
-    const { app, page, workspacePath } = await launchNoteBerry(testInfo)
+    const { app, page, workspacePath } = await launchQuestBerry(testInfo)
     try {
       await switchToEnglish(page)
       const expectations = [
@@ -137,7 +137,7 @@ test.describe('NoteBerry Electron QA', () => {
   })
 
   test('creates template notes, edits metadata and markdown, then persists changes', async ({}, testInfo) => {
-    const { app, page, workspacePath } = await launchNoteBerry(testInfo)
+    const { app, page, workspacePath } = await launchQuestBerry(testInfo)
     try {
       await switchToEnglish(page)
       await page.getByRole('button', { name: 'New' }).click()
@@ -173,7 +173,7 @@ test.describe('NoteBerry Electron QA', () => {
   })
 
   test('flushes pending note edits when the window closes immediately', async ({}, testInfo) => {
-    const { app, page, workspacePath } = await launchNoteBerry(testInfo)
+    const { app, page, workspacePath } = await launchQuestBerry(testInfo)
     await switchToEnglish(page)
     await page.getByRole('button', { name: 'Edit' }).click()
     await page.getByLabel('Note content').fill('Quick close field report with [[Hidden Pier]].')
@@ -182,7 +182,7 @@ test.describe('NoteBerry Electron QA', () => {
   })
 
   test('updates pinning, status states, and note ordering', async ({}, testInfo) => {
-    const { app, page, workspacePath } = await launchNoteBerry(testInfo)
+    const { app, page, workspacePath } = await launchQuestBerry(testInfo)
     try {
       await switchToEnglish(page)
       await page.locator('.note-card', { hasText: 'Archivist Nara' }).click()
@@ -218,7 +218,7 @@ test.describe('NoteBerry Electron QA', () => {
         pinned: 1,
       }],
     } as never
-    const { app, page, workspacePath } = await launchNoteBerry(testInfo, { workspace: damaged })
+    const { app, page, workspacePath } = await launchQuestBerry(testInfo, { workspace: damaged })
     try {
       await switchToEnglish(page)
       await page.getByRole('button', { name: 'Edit' }).click()
@@ -234,7 +234,7 @@ test.describe('NoteBerry Electron QA', () => {
   })
 
   test('keeps desktop and narrow layouts bounded and screenshot-stable', async ({}, testInfo) => {
-    const { app, page } = await launchNoteBerry(testInfo, { workspace: sampleWorkspace() })
+    const { app, page } = await launchQuestBerry(testInfo, { workspace: sampleWorkspace() })
     try {
       await switchToEnglish(page)
       await assertVisibleLayout(page)

@@ -24,7 +24,7 @@ export interface NoteWorkspace {
   notes: VttNote[]
 }
 
-export interface LaunchedNoteBerry {
+export interface LaunchedQuestBerry {
   app: ElectronApplication
   page: Page
   userDataDir: string
@@ -71,19 +71,19 @@ export function prepareUserData(userDataDir: string, workspace: NoteWorkspace = 
   rmSync(userDataDir, { recursive: true, force: true })
   const dataDir = join(userDataDir, 'data')
   ensureDir(dataDir)
-  const workspacePath = join(dataDir, 'noteberry-workspace.json')
+  const workspacePath = join(dataDir, 'questberry-workspace.json')
   writeFileSync(workspacePath, JSON.stringify(workspace, null, 2), 'utf8')
   return workspacePath
 }
 
-export async function launchNoteBerry(testInfo: TestInfo, options: { workspace?: NoteWorkspace; viewport?: { width: number; height: number } } = {}): Promise<LaunchedNoteBerry> {
+export async function launchQuestBerry(testInfo: TestInfo, options: { workspace?: NoteWorkspace; viewport?: { width: number; height: number } } = {}): Promise<LaunchedQuestBerry> {
   const userDataDir = join(testInfo.outputDir, 'user-data')
   const workspacePath = prepareUserData(userDataDir, options.workspace ?? sampleWorkspace())
   const app = await electron.launch({
     args: [APP_ENTRY],
     env: {
       ...process.env,
-      NOTEBERRY_E2E_USER_DATA: userDataDir,
+      QUESTBERRY_E2E_USER_DATA: userDataDir,
     },
   })
   const page = await app.firstWindow()
