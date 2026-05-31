@@ -2,6 +2,10 @@
   <img src="resources/logo.png" alt="QuestBerry Logo" width="220">
 </p>
 
+> **Weiterführung:** NoteBerry wird nicht mehr als eigenständige App fortgeführt.
+> Die App geht gemeinsam mit CharBerry in **QuestBerry** auf:
+> https://github.com/RollBerryStudios/QuestBerry
+
 <h1 align="center">QuestBerry</h1>
 
 <p align="center">
